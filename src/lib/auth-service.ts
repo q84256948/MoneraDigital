@@ -1,19 +1,26 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import sql from './db';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+export const authSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
 
 export class AuthService {
   /**
    * 注册新用户
    */
   static async register(email: string, password: string) {
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const validated = authSchema.parse({ email, password });
+    
+    const hashedPassword = await bcrypt.hash(validated.password, 10);
 
     try {
       const [user] = await sql`
@@ -34,12 +41,10 @@ export class AuthService {
    * 用户登录并生成 JWT
    */
   static async login(email: string, password: string) {
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
+    const validated = authSchema.parse({ email, password });
 
     const [user] = await sql`
-      SELECT id, email, password FROM users WHERE email = ${email}
+      SELECT id, email, password FROM users WHERE email = ${validated.email}
     `;
 
     if (!user) {

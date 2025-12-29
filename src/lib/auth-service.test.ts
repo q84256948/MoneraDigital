@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+// 设置环境变量以便导入 AuthService 时不报错
+process.env.JWT_SECRET = 'test-secret';
 import { AuthService } from './auth-service';
 import sql from './db';
 import bcrypt from 'bcryptjs';
@@ -40,7 +42,15 @@ describe('AuthService', () => {
     });
 
     it('should throw error if email or password missing', async () => {
-      await expect(AuthService.register('', '')).rejects.toThrow('Email and password are required');
+      await expect(AuthService.register('', '')).rejects.toThrow();
+    });
+
+    it('should throw error for invalid email format', async () => {
+      await expect(AuthService.register('invalid-email', 'password123')).rejects.toThrow('Invalid email format');
+    });
+
+    it('should throw error for short password', async () => {
+      await expect(AuthService.register('test@example.com', '123')).rejects.toThrow('Password must be at least 6 characters');
     });
 
     it('should throw error if user already exists', async () => {
@@ -81,7 +91,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error if email or password missing', async () => {
-      await expect(AuthService.login('', '')).rejects.toThrow('Email and password are required');
+      await expect(AuthService.login('', '')).rejects.toThrow();
     });
   });
 });
