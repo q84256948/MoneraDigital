@@ -1,15 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const navItems = [
-    { label: "Products", href: "#products" },
-    { label: "Solutions", href: "#solutions" },
-    { label: "About", href: "#about" },
-    { label: "Insights", href: "#insights" },
+    { label: t("header.nav.products"), href: "#products" },
+    { label: t("header.nav.solutions"), href: "#solutions" },
+    { label: t("header.nav.about"), href: "#about" },
+    { label: t("header.nav.insights"), href: "#insights" },
   ];
 
   return (
@@ -41,11 +44,12 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
+            <LanguageSwitcher />
             <Button variant="ghost" size="sm">
-              Sign In
+              {t("header.auth.signIn")}
             </Button>
             <Button variant="default" size="sm">
-              Get Started
+              {t("header.auth.getStarted")}
             </Button>
           </div>
 
@@ -73,11 +77,14 @@ const Header = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-3 pt-4 border-t border-border">
+                <div className="px-2">
+                  <LanguageSwitcher />
+                </div>
                 <Button variant="ghost" size="sm" className="justify-start">
-                  Sign In
+                  {t("header.auth.signIn")}
                 </Button>
                 <Button variant="default" size="sm">
-                  Get Started
+                  {t("header.auth.getStarted")}
                 </Button>
               </div>
             </nav>

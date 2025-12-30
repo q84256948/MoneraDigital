@@ -1,0 +1,194 @@
+{
+  "header": {
+    "nav": {
+      "products": "Products",
+      "solutions": "Solutions",
+      "about": "About",
+      "insights": "Insights"
+    },
+    "auth": {
+      "signIn": "Sign In",
+      "getStarted": "Get Started"
+    }
+  },
+  "hero": {
+    "badge": "Institutional-Grade Digital Asset Platform",
+    "headline": "The Future of",
+    "headlineHighlight": "Digital Asset Banking",
+    "subheadline": "Transparent, secure, and sophisticated financial services for high-net-worth individuals. Unlock premium yields through institutional-grade structured products.",
+    "buttons": {
+      "startEarning": "Start Earning",
+      "exploreProducts": "Explore Products"
+    },
+    "trustIndicators": {
+      "coldStorage": "Cold Storage Security",
+      "apy": "8-12% Target APY",
+      "segregation": "Full Asset Segregation"
+    }
+  },
+  "features": {
+    "sectionLabel": "Core Capabilities",
+    "title": "Institutional Excellence",
+    "description": "A comprehensive suite of digital asset services designed for sophisticated investors seeking premium returns with institutional-grade security.",
+    "items": [
+      {
+        "title": "Structured Lending",
+        "description": "Earn competitive yields by lending your digital assets through our institutional-grade platform with full transparency."
+      },
+      {
+        "title": "Market Arbitrage",
+        "description": "Benefit from sophisticated trading strategies that capture cross-exchange spreads, basis trades, and liquidity premiums."
+      },
+      {
+        "title": "Cold Storage Security",
+        "description": "All client assets stored in multi-signature or MPC cold wallets, completely segregated from operational funds."
+      },
+      {
+        "title": "Institutional Framework",
+        "description": "Enterprise-grade risk management with real-time monitoring, credit assessment, and comprehensive stress testing."
+      },
+      {
+        "title": "Structured Products",
+        "description": "Access sophisticated investment vehicles including fixed-income notes and strategic yield enhancement products."
+      },
+      {
+        "title": "Flexible Terms",
+        "description": "Choose from multiple lending durations and yield tiers to match your investment timeline and risk appetite."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "value": "$100M+",
+        "label": "Target AUM",
+        "sublabel": "Year 1"
+      },
+      {
+        "value": "8-12%",
+        "label": "Target APY",
+        "sublabel": "Risk-adjusted"
+      },
+      {
+        "value": "99.95%",
+        "label": "Uptime SLA",
+        "sublabel": "Platform availability"
+      },
+      {
+        "value": "100%",
+        "label": "Asset Segregation",
+        "sublabel": "Cold storage"
+      }
+    ]
+  },
+  "howItWorks": {
+    "sectionLabel": "Simple Process",
+    "title": "How It Works",
+    "description": "A seamless journey from onboarding to earning institutional-grade yields on your digital assets.",
+    "steps": [
+      {
+        "number": "01",
+        "title": "Onboarding & KYC",
+        "description": "Complete our streamlined verification process designed for high-net-worth individuals with institutional-grade compliance."
+      },
+      {
+        "number": "02",
+        "title": "Deposit Assets",
+        "description": "Transfer your digital assets to our secure cold storage infrastructure with full segregation and real-time monitoring."
+      },
+      {
+        "number": "03",
+        "title": "Earn Yields",
+        "description": "Your assets generate returns through our sophisticated market strategies while you maintain full transparency and control."
+      },
+      {
+        "number": "04",
+        "title": "Withdraw Anytime",
+        "description": "Access your principal and earned yields according to your chosen terms with complete flexibility and no hidden fees."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Maximize Your",
+    "titleHighlight": "Digital Asset Returns?",
+    "description": "Join sophisticated investors who trust Monera Digital for institutional-grade digital asset management. Start earning premium yields today.",
+    "buttons": {
+      "consultation": "Schedule Consultation",
+      "documentation": "View Documentation"
+    },
+    "footnote": "Minimum deposit: $100,000 • Dedicated relationship manager • 24/7 support"
+  },
+  "footer": {
+    "tagline": "Institutional-grade digital asset platform for sophisticated investors seeking premium yields and security.",
+    "sections": {
+      "products": "Products",
+      "company": "Company",
+      "resources": "Resources",
+      "legal": "Legal"
+    },
+    "links": {
+      "structuredLending": "Structured Lending",
+      "fixedIncome": "Fixed Income",
+      "yieldProducts": "Yield Products",
+      "custodyServices": "Custody Services",
+      "aboutUs": "About Us",
+      "careers": "Careers",
+      "press": "Press",
+      "contact": "Contact",
+      "documentation": "Documentation",
+      "research": "Research",
+      "api": "API",
+      "status": "Status",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "riskDisclosure": "Risk Disclosure",
+      "compliance": "Compliance"
+    },
+    "copyright": "© {year} Monera Digital. All rights reserved.",
+    "riskDisclaimer": "Digital asset investments involve significant risk. Past performance does not guarantee future results. Please review our risk disclosure before investing."
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "description": "Enter your email and password to access your account.",
+      "email": "Email",
+      "emailPlaceholder": "m@example.com",
+      "password": "Password",
+      "button": "Login",
+      "loggingIn": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "register": "Register",
+      "successMessage": "Logged in successfully"
+    },
+    "register": {
+      "title": "Register",
+      "description": "Create a new account to get started.",
+      "email": "Email",
+      "emailPlaceholder": "m@example.com",
+      "password": "Password",
+      "button": "Register",
+      "registering": "Registering...",
+      "hasAccount": "Already have an account?",
+      "login": "Login",
+      "successMessage": "Registration successful. Please log in."
+    },
+    "errors": {
+      "loginFailed": "Login failed",
+      "registrationFailed": "Registration failed",
+      "invalidEmail": "Invalid email format",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "userAlreadyExists": "User already exists",
+      "invalidEmailOrPassword": "Invalid email or password"
+    }
+  },
+  "notFound": {
+    "title": "404 - Page Not Found",
+    "description": "Sorry, the page you're looking for doesn't exist.",
+    "button": "Go Home"
+  },
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "chinese": "简体中文"
+  }
+}

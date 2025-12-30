@@ -1,16 +1,15 @@
-const stats = [
-  { value: "$100M+", label: "Target AUM", sublabel: "Year 1" },
-  { value: "8-12%", label: "Target APY", sublabel: "Risk-adjusted" },
-  { value: "99.95%", label: "Uptime SLA", sublabel: "Platform availability" },
-  { value: "100%", label: "Asset Segregation", sublabel: "Cold storage" },
-];
+import { useTranslation } from "react-i18next";
 
 const Stats = () => {
+  const { t } = useTranslation();
+
+  const stats = t("stats.items", { returnObjects: true }) as any[];
+
   return (
     <section className="py-20 relative">
       {/* Background Accent */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
-      
+
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
