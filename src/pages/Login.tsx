@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp";
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -109,22 +111,30 @@ export default function Login() {
                 </div>
               </>
             ) : (
-              <div className="space-y-2 text-center">
-                <Label>{t("dashboard.security.enterCode")}</Label>
-                <Input
-                  autoFocus
-                  placeholder="000000"
-                  value={twoFactorToken}
-                  onChange={(e) => setTwoFactorToken(e.target.value)}
-                  className="text-center text-2xl tracking-[0.5em] font-bold"
+              <div className="flex flex-col items-center space-y-4 py-4">
+                <InputOTP
                   maxLength={6}
-                  required
-                />
+                  value={twoFactorToken}
+                  onChange={(value) => setTwoFactorToken(value)}
+                  autoFocus
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
             )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading || (requires2FA && twoFactorToken.length !== 6)}>
               {isLoading ? t("auth.login.loggingIn") : (requires2FA ? t("dashboard.security.verify") : t("auth.login.button"))}
             </Button>
             {!requires2FA && (

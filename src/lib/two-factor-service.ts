@@ -1,28 +1,36 @@
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
+import crypto from 'crypto';
 import { db } from './db.js';
 import { users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
+import { encrypt, decrypt } from './encryption.js';
 import logger from './logger.js';
 
 export class TwoFactorService {
   /**
-   * 生成新的 2FA 密钥和二维码
+   * 生成新的 2FA 密钥、二维码和恢复码
    */
   static async setup(userId: number, email: string) {
     const secret = authenticator.generateSecret();
     const otpauth = authenticator.keyuri(email, 'Monera Digital', secret);
     
+    // 生成 10 个恢复码
+    const backupCodes = Array.from({ length: 10 }, () => 
+      crypto.randomBytes(4).toString('hex').toUpperCase()
+    );
+    
     const qrCodeUrl = await QRCode.toDataURL(otpauth);
     
-    logger.info({ userId }, 'Generated new 2FA secret');
-    
-    // 暂时存入数据库（此时尚未启用）
+    // 存储加密后的密钥和恢复码
     await db.update(users)
-      .set({ twoFactorSecret: secret })
+      .set({ 
+        twoFactorSecret: encrypt(secret),
+        twoFactorBackupCodes: encrypt(JSON.stringify(backupCodes))
+      })
       .where(eq(users.id, userId));
 
-    return { secret, qrCodeUrl };
+    return { secret, qrCodeUrl, backupCodes };
   }
 
   /**
@@ -35,9 +43,10 @@ export class TwoFactorService {
       throw new Error('2FA has not been set up');
     }
 
-    const isValid = authenticator.check(token, user.twoFactorSecret);
+    const decryptedSecret = decrypt(user.twoFactorSecret);
+    const isValid = authenticator.check(token, decryptedSecret);
+    
     if (!isValid) {
-      logger.warn({ userId }, '2FA enable failed: invalid token');
       throw new Error('Invalid verification code');
     }
 
@@ -45,38 +54,42 @@ export class TwoFactorService {
       .set({ twoFactorEnabled: true })
       .where(eq(users.id, userId));
     
-    logger.info({ userId }, '2FA enabled successfully');
     return true;
   }
 
   /**
-   * 验证登录时的 2FA 代码
+   * 验证代码 (支持主验证码和恢复码)
    */
   static async verify(userId: number, token: string) {
     const [user] = await db.select().from(users).where(eq(users.id, userId));
     
     if (!user || !user.twoFactorSecret || !user.twoFactorEnabled) {
-      // 如果没开启 2FA，默认通过（理论上业务层应先判断）
       return true;
     }
 
-    return authenticator.check(token, user.twoFactorSecret);
-  }
-
-  /**
-   * 关闭 2FA
-   */
-  static async disable(userId: number, token: string) {
-    const isValid = await this.verify(userId, token);
-    if (!isValid) {
-      throw new Error('Invalid verification code');
+    // 1. 尝试验证 TOTP
+    const decryptedSecret = decrypt(user.twoFactorSecret);
+    if (authenticator.check(token, decryptedSecret)) {
+      return true;
     }
 
-    await db.update(users)
-      .set({ twoFactorEnabled: false, twoFactorSecret: null })
-      .where(eq(users.id, userId));
-    
-    logger.info({ userId }, '2FA disabled');
-    return true;
+    // 2. 尝试验证恢复码
+    if (user.twoFactorBackupCodes) {
+      const backupCodes: string[] = JSON.parse(decrypt(user.twoFactorBackupCodes));
+      const codeIndex = backupCodes.indexOf(token.toUpperCase());
+      
+      if (codeIndex !== -1) {
+        // 恢复码正确，将其移除并更新数据库
+        backupCodes.splice(codeIndex, 1);
+        await db.update(users)
+          .set({ twoFactorBackupCodes: encrypt(JSON.stringify(backupCodes)) })
+          .where(eq(users.id, userId));
+        
+        logger.info({ userId }, 'Used a 2FA backup code');
+        return true;
+      }
+    }
+
+    return false;
   }
 }

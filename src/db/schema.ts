@@ -8,6 +8,7 @@ export const users = pgTable('users', {
   password: text('password').notNull(),
   twoFactorSecret: text('two_factor_secret'),
   twoFactorEnabled: boolean('two_factor_enabled').default(false).notNull(),
+  twoFactorBackupCodes: text('two_factor_backup_codes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

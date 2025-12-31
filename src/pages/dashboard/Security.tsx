@@ -13,32 +13,11 @@ const Security = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [secret, setSecret] = useState("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [token, setToken] = useState("");
   const [isSettingUp, setIsSettingUp] = useState(false);
+  const [step, setStep] = useState(1); // 1: QR, 2: Backup Codes
   const [open, setOpen] = useState(false);
-
-  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
-
-  const fetchStatus = async () => {
-    try {
-      const authToken = localStorage.getItem("token");
-      const res = await fetch("/api/auth/me", {
-        headers: { Authorization: `Bearer ${authToken}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setIsEnabled(data.twoFactorEnabled);
-      }
-    } catch (error) {
-      console.error("Failed to fetch security status", error);
-    } finally {
-      setIsLoadingStatus(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchStatus();
-  }, []);
 
   const handleSetup = async () => {
     setIsSettingUp(true);
@@ -52,6 +31,8 @@ const Security = () => {
       if (res.ok) {
         setQrCode(data.qrCodeUrl);
         setSecret(data.secret);
+        setBackupCodes(data.backupCodes);
+        setStep(1);
         setOpen(true);
       } else {
         throw new Error(data.error);
@@ -158,38 +139,56 @@ const Security = () => {
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                       <DialogTitle>{t("dashboard.security.setup2FA")}</DialogTitle>
-                      <DialogDescription>{t("dashboard.security.scanQR")}</DialogDescription>
+                      <DialogDescription>
+                        {step === 1 ? t("dashboard.security.scanQR") : "Save your backup codes in a safe place."}
+                      </DialogDescription>
                     </DialogHeader>
-                    <div className="flex flex-col items-center gap-6 py-4">
-                      {qrCode ? (
-                        <div className="p-4 bg-white rounded-xl">
-                          <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+
+                    {step === 1 ? (
+                      <div className="flex flex-col items-center gap-6 py-4">
+                        {qrCode ? (
+                          <div className="p-4 bg-white rounded-xl">
+                            <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+                          </div>
+                        ) : (
+                          <div className="w-48 h-48 bg-secondary animate-pulse rounded-xl flex items-center justify-center text-xs text-muted-foreground" />
+                        )}
+                        <div className="w-full space-y-2 text-center">
+                          <p className="text-xs text-muted-foreground font-medium">Secret Key (Manual):</p>
+                          <code className="text-xs font-mono bg-secondary px-3 py-1 rounded-full border border-border">{secret}</code>
                         </div>
-                      ) : (
-                        <div className="w-48 h-48 bg-secondary animate-pulse rounded-xl flex items-center justify-center text-xs text-muted-foreground text-center px-4">
-                          Generating secure secret...
+                        <Button onClick={() => setStep(2)} className="w-full">Next: Backup Codes</Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-6 py-4">
+                        <div className="grid grid-cols-2 gap-2 p-4 bg-secondary/30 rounded-xl border border-border">
+                          {backupCodes.map(code => (
+                            <code key={code} className="text-xs font-mono text-center py-1">{code}</code>
+                          ))}
                         </div>
-                      )}
-                      <div className="w-full space-y-2 text-center">
-                        <p className="text-xs text-muted-foreground">Secret Key (Manual Entry):</p>
-                        <code className="text-xs font-mono bg-secondary px-2 py-1 rounded">{secret}</code>
+                        <div className="flex gap-2 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                          <Info size={16} className="text-blue-500 shrink-0" />
+                          <p className="text-[11px] text-blue-200/80 leading-relaxed">
+                            These codes can be used once each to log in if you lose your device.
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{t("dashboard.security.enterCode")}</Label>
+                          <Input 
+                            placeholder="000000" 
+                            value={token} 
+                            onChange={(e) => setToken(e.target.value)}
+                            className="text-center text-lg tracking-[0.5em] font-bold"
+                            maxLength={6}
+                          />
+                        </div>
+                        <DialogFooter>
+                          <Button onClick={handleEnable} className="w-full" disabled={isSettingUp || token.length !== 6}>
+                            {isSettingUp ? "Verifying..." : t("dashboard.security.verify")}
+                          </Button>
+                        </DialogFooter>
                       </div>
-                      <div className="w-full space-y-2">
-                        <Label>{t("dashboard.security.enterCode")}</Label>
-                        <Input 
-                          placeholder="000000" 
-                          value={token} 
-                          onChange={(e) => setToken(e.target.value)}
-                          className="text-center text-lg tracking-[0.5em] font-bold"
-                          maxLength={6}
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={handleEnable} className="w-full" disabled={isSettingUp || token.length !== 6}>
-                        {isSettingUp ? "Verifying..." : t("dashboard.security.verify")}
-                      </Button>
-                    </DialogFooter>
+                    )}
                   </DialogContent>
                 </Dialog>
               </div>
