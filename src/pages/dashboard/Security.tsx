@@ -17,13 +17,31 @@ const Security = () => {
   const [isSettingUp, setIsSettingUp] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+
+  const fetchStatus = async () => {
+    try {
+      const authToken = localStorage.getItem("token");
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIsEnabled(data.twoFactorEnabled);
+      }
+    } catch (error) {
+      console.error("Failed to fetch security status", error);
+    } finally {
+      setIsLoadingStatus(false);
+    }
+  };
+
   useEffect(() => {
-    // 实际应从后端获取当前用户的 2FA 状态，这里简化处理，假设从 localStorage 获取部分信息
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    // 提示：真实场景应调用 GET /api/auth/me
+    fetchStatus();
   }, []);
 
   const handleSetup = async () => {
+    setIsSettingUp(true);
     try {
       const authToken = localStorage.getItem("token");
       const res = await fetch("/api/auth/2fa/setup", {
@@ -31,11 +49,17 @@ const Security = () => {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       const data = await res.json();
-      setQrCode(data.qrCodeUrl);
-      setSecret(data.secret);
-      setOpen(true);
-    } catch (error) {
-      toast.error("Failed to start 2FA setup");
+      if (res.ok) {
+        setQrCode(data.qrCodeUrl);
+        setSecret(data.secret);
+        setOpen(true);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to start 2FA setup");
+    } finally {
+      setIsSettingUp(false);
     }
   };
 
@@ -123,8 +147,13 @@ const Security = () => {
                 </div>
 
                 <Dialog open={open} onOpenChange={setOpen}>
-                  <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={isEnabled ? undefined : handleSetup}>
-                    {isEnabled ? t("dashboard.security.disable2FA") : t("dashboard.security.enable2FA")}
+                  <Button 
+                    variant={isEnabled ? "outline" : "default"} 
+                    size="sm" 
+                    onClick={isEnabled ? undefined : handleSetup}
+                    disabled={isSettingUp || isLoadingStatus}
+                  >
+                    {isSettingUp ? "..." : (isEnabled ? t("dashboard.security.disable2FA") : t("dashboard.security.enable2FA"))}
                   </Button>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -132,9 +161,13 @@ const Security = () => {
                       <DialogDescription>{t("dashboard.security.scanQR")}</DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-col items-center gap-6 py-4">
-                      {qrCode && (
+                      {qrCode ? (
                         <div className="p-4 bg-white rounded-xl">
                           <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+                        </div>
+                      ) : (
+                        <div className="w-48 h-48 bg-secondary animate-pulse rounded-xl flex items-center justify-center text-xs text-muted-foreground text-center px-4">
+                          Generating secure secret...
                         </div>
                       )}
                       <div className="w-full space-y-2 text-center">
