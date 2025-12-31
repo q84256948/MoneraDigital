@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Lock, Smartphone, Globe, CheckCircle2, ShieldAlert, Info, AlertTriangle } from "lucide-react";
+import { Lock, Smartphone, Globe, CheckCircle2, ShieldAlert, Info } from "lucide-react";
 import { toast } from "sonner";
 
 const Security = () => {
@@ -250,7 +250,5 @@ const Security = () => {
     </div>
   );
 };
-
-import { Dialog } from "@/components/ui/dialog";
 
 export default Security;
