@@ -19,14 +19,34 @@ const Security = () => {
   const [step, setStep] = useState(1); // 1: QR, 2: Backup Codes
   const [open, setOpen] = useState(false);
 
+  const fetchStatus = async () => {
+    try {
+      const authToken = localStorage.getItem("token");
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIsEnabled(data.twoFactorEnabled);
+      }
+    } catch (error) {
+      console.error("Security fetchStatus error:", error);
+    }
+  };
+
   const handleSetup = async () => {
     setIsSettingUp(true);
     try {
       const authToken = localStorage.getItem("token");
-      const res = await fetch("/api/auth/2fa/setup", {
+      const res = await await fetch("/api/auth/2fa/setup", {
         method: "POST",
         headers: { Authorization: `Bearer ${authToken}` }
       });
+      
+      if (res.status === 404) {
+        throw new Error("2FA Setup API endpoint not found (404)");
+      }
+
       const data = await res.json();
       if (res.ok) {
         setQrCode(data.qrCodeUrl);
@@ -38,6 +58,7 @@ const Security = () => {
         throw new Error(data.error);
       }
     } catch (error: any) {
+      console.error("2FA Setup error:", error);
       toast.error(error.message || "Failed to start 2FA setup");
     } finally {
       setIsSettingUp(false);
@@ -46,6 +67,7 @@ const Security = () => {
 
   const handleEnable = async () => {
     setIsSettingUp(true);
+    console.log("Attempting to enable 2FA with token:", token);
     try {
       const authToken = localStorage.getItem("token");
       const res = await fetch("/api/auth/2fa/enable", {
@@ -56,6 +78,11 @@ const Security = () => {
         },
         body: JSON.stringify({ token })
       });
+
+      if (res.status === 404) {
+        throw new Error("2FA Enable API endpoint not found (404)");
+      }
+
       const data = await res.json();
       if (res.ok) {
         toast.success(t("dashboard.security.enabled"));
@@ -65,6 +92,7 @@ const Security = () => {
         throw new Error(data.error);
       }
     } catch (error: any) {
+      console.error("2FA Enable error:", error);
       toast.error(error.message);
     } finally {
       setIsSettingUp(false);
