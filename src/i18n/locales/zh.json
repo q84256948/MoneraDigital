@@ -192,5 +192,38 @@
     "language": "语言",
     "english": "English",
     "chinese": "简体中文"
+  },
+  "dashboard": {
+    "nav": {
+      "overview": "概览",
+      "assets": "资产总览",
+      "lending": "借贷管理",
+      "investments": "投资产品",
+      "security": "安全设置",
+      "statements": "账户对账单"
+    },
+    "overview": {
+      "totalBalance": "资产总额",
+      "activeLending": "当前借贷状态",
+      "investmentPerformance": "投资产品表现",
+      "marketTrends": "市场关键指标",
+      "assetDistribution": "资产分布"
+    },
+    "assets": {
+      "currency": "币种",
+      "total": "总额",
+      "available": "可用",
+      "frozen": "冻结",
+      "source": "来源",
+      "owned": "自有",
+      "borrowed": "借入"
+    },
+    "security": {
+      "title": "安全设置",
+      "password": "登录密码",
+      "twoFactor": "双因素认证 (2FA)",
+      "apiKeys": "API 密钥",
+      "whitelist": "提币地址白名单"
+    }
   }
 }

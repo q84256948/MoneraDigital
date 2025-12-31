@@ -192,5 +192,38 @@
     "language": "Language",
     "english": "English",
     "chinese": "简体中文"
+  },
+  "dashboard": {
+    "nav": {
+      "overview": "Overview",
+      "assets": "Assets",
+      "lending": "Lending",
+      "investments": "Investments",
+      "security": "Security",
+      "statements": "Statements"
+    },
+    "overview": {
+      "totalBalance": "Total Balance",
+      "activeLending": "Active Lending",
+      "investmentPerformance": "Investment Performance",
+      "marketTrends": "Market Trends",
+      "assetDistribution": "Asset Distribution"
+    },
+    "assets": {
+      "currency": "Currency",
+      "total": "Total",
+      "available": "Available",
+      "frozen": "Frozen",
+      "source": "Source",
+      "owned": "Owned",
+      "borrowed": "Borrowed"
+    },
+    "security": {
+      "title": "Security Settings",
+      "password": "Password",
+      "twoFactor": "Two-Factor Authentication",
+      "apiKeys": "API Keys",
+      "whitelist": "Withdrawal Whitelist"
+    }
   }
 }
