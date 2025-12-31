@@ -74,7 +74,7 @@ const Header = () => {
                 </div>
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
                   <LogOut size={16} />
-                  {t("auth.logout") || "Logout"}
+                  {t("auth.login.logout")}
                 </Button>
               </div>
             ) : (
@@ -124,7 +124,7 @@ const Header = () => {
                     </div>
                     <Button variant="ghost" size="sm" className="justify-start gap-2" onClick={() => { handleLogout(); setIsMenuOpen(false); }}>
                       <LogOut size={16} />
-                      {t("auth.logout") || "Logout"}
+                      {t("auth.login.logout")}
                     </Button>
                   </>
                 ) : (
