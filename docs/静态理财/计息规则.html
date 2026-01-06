@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>计息规则</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/计息规则/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-3.7.1.min.js"></script>
+    <script src="resources/scripts/axure/axQuery.js"></script>
+    <script src="resources/scripts/axure/globals.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/axure/annotation.js"></script>
+    <script src="resources/scripts/axure/axQuery.std.js"></script>
+    <script src="resources/scripts/axure/doc.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+    <script src="resources/scripts/axure/events.js"></script>
+    <script src="resources/scripts/axure/recording.js"></script>
+    <script src="resources/scripts/axure/action.js"></script>
+    <script src="resources/scripts/axure/expr.js"></script>
+    <script src="resources/scripts/axure/geometry.js"></script>
+    <script src="resources/scripts/axure/flyout.js"></script>
+    <script src="resources/scripts/axure/model.js"></script>
+    <script src="resources/scripts/axure/repeater.js"></script>
+    <script src="resources/scripts/axure/sto.js"></script>
+    <script src="resources/scripts/axure/utils.temp.js"></script>
+    <script src="resources/scripts/axure/variables.js"></script>
+    <script src="resources/scripts/axure/drag.js"></script>
+    <script src="resources/scripts/axure/move.js"></script>
+    <script src="resources/scripts/axure/visibility.js"></script>
+    <script src="resources/scripts/axure/style.js"></script>
+    <script src="resources/scripts/axure/adaptive.js"></script>
+    <script src="resources/scripts/axure/tree.js"></script>
+    <script src="resources/scripts/axure/init.temp.js"></script>
+    <script src="resources/scripts/axure/legacy.js"></script>
+    <script src="resources/scripts/axure/viewer.js"></script>
+    <script src="resources/scripts/axure/math.js"></script>
+    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
+    <script src="data/document.js"></script>
+    <script src="files/计息规则/data.js"></script>
+    <script type="text/javascript">
+      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
+      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
+      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
+    </script>
+  </head>
+  <body>
+    <div id="base" class="">
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u493" class="ax_default _文本段落 transition notrs">
+        <div id="u493_div" class=""></div>
+        <div id="u493_text" class="text ">
+          <p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">计息规则：</span></p><p><span style="font-family:'ArialMT', 'Arial', sans-serif;"><br></span></p><p><span style="font-family:'ArialMT', 'Arial', sans-serif;">1</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">、申购日为</span><span style="font-family:'ArialMT', 'Arial', sans-serif;">T</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">日，</span><span style="font-family:'ArialMT', 'Arial', sans-serif;">T+1</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">日</span><span style="font-family:'ArialMT', 'Arial', sans-serif;">8</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">：</span><span style="font-family:'ArialMT', 'Arial', sans-serif;">00</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">开始计息，T+产品期限+1日8：00更新昨日利息后，进入赎回流程结算实际赎回数量</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">2、每笔订单的日利息=申购数量*年化利率/365</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">每笔订单的预期利息=日利息*期限</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">3、在赎回时判断到期日与赎回时间，到期日前赎回时，更新订单的应扣数量=应扣数量+累计利息。</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">4、赎回时的实际赎回数量=申购本金+累计利息-应扣数量</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u494" class="ax_default _文本段落 transition notrs">
+        <div id="u494_div" class=""></div>
+        <div id="u494_text" class="text ">
+          <p><span>公式字段解释：</span></p><p><span><br></span></p><p><span>应扣数量：指在订单表中定义的，需要参与实际赎回数量计算的值，通过这个值可以在后续拓展违约金、扣罚等场景时更加方便的实现逻辑</span></p><p><span><br></span></p><p><span>累计利息：每个订单按照利息更新周期更新最新一期利息后，会将其加到累计利息中，记录到目前为止实际产生的利息</span></p>
+        </div>
+      </div>
+    </div>
+    <script src="resources/scripts/axure/ios.js"></script>
+  </body>
+</html>

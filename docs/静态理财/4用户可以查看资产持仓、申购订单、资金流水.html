@@ -1,0 +1,774 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>4用户可以查看资产持仓、申购订单、资金流水</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/4用户可以查看资产持仓、申购订单、资金流水/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-3.7.1.min.js"></script>
+    <script src="resources/scripts/axure/axQuery.js"></script>
+    <script src="resources/scripts/axure/globals.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/axure/annotation.js"></script>
+    <script src="resources/scripts/axure/axQuery.std.js"></script>
+    <script src="resources/scripts/axure/doc.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+    <script src="resources/scripts/axure/events.js"></script>
+    <script src="resources/scripts/axure/recording.js"></script>
+    <script src="resources/scripts/axure/action.js"></script>
+    <script src="resources/scripts/axure/expr.js"></script>
+    <script src="resources/scripts/axure/geometry.js"></script>
+    <script src="resources/scripts/axure/flyout.js"></script>
+    <script src="resources/scripts/axure/model.js"></script>
+    <script src="resources/scripts/axure/repeater.js"></script>
+    <script src="resources/scripts/axure/sto.js"></script>
+    <script src="resources/scripts/axure/utils.temp.js"></script>
+    <script src="resources/scripts/axure/variables.js"></script>
+    <script src="resources/scripts/axure/drag.js"></script>
+    <script src="resources/scripts/axure/move.js"></script>
+    <script src="resources/scripts/axure/visibility.js"></script>
+    <script src="resources/scripts/axure/style.js"></script>
+    <script src="resources/scripts/axure/adaptive.js"></script>
+    <script src="resources/scripts/axure/tree.js"></script>
+    <script src="resources/scripts/axure/init.temp.js"></script>
+    <script src="resources/scripts/axure/legacy.js"></script>
+    <script src="resources/scripts/axure/viewer.js"></script>
+    <script src="resources/scripts/axure/math.js"></script>
+    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
+    <script src="data/document.js"></script>
+    <script src="files/4用户可以查看资产持仓、申购订单、资金流水/data.js"></script>
+    <script type="text/javascript">
+      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
+      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
+      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
+    </script>
+  </head>
+  <body>
+    <div id="base" class="">
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u315" class="ax_default label transition notrs">
+        <div id="u315_div" class=""></div>
+        <div id="u315_text" class="text ">
+          <p><span>一、业务逻辑：</span></p><p><span>1、用户可以在理财账户查看持仓资产统计和资金流水情况</span></p><p><span>2、用户可以在申购记录查看每笔订单明细</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u316" class="ax_default label transition notrs">
+        <div id="u316_div" class=""></div>
+        <div id="u316_text" class="text ">
+          <p><span style="color:#000000;">二、问题与方案：</span></p><p><span style="color:#000000;">&nbsp; 背景：由于用户申购成功后，资产会从个人账户划转到公司账户，按照现有逻辑便无法将用户申</span></p><p><span style="color:#000000;">购的理财产品统计成为资产，若利用申购记录进行统计则可能发生订单数据推送失败无法统计的问题。</span></p><p><span style="color:#000000;">&nbsp; 账户整体方案：新增‘用户-理财凭证账户’，对用户隐藏，</span><span>用于记录用户理财本金流水变动情况的镜像，</span><span style="color:#000000;">在统计</span></p><p><span style="color:#000000;">用户资产情况时需统计理财凭证账户。系统账户类似双币理财需求，新增两个账户，账户列表如下：</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Table) -->
+      <div id="u317" class="ax_default">
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u318" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u318.svg" id="u318_img" class="img generatedImage" viewbox="0 0 91 24">
+
+  <path d="M 1 1  L 91 1  L 91 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" class="stroke" />
+  <path d="M 0 0.5  L 91 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" class="stroke" />
+          </svg>
+          <div id="u318_text" class="text ">
+            <p><span>账户类型</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u319" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u319.svg" id="u319_img" class="img generatedImage" viewbox="91 0 165 24">
+
+  <path d="M 1 1  L 165 1  L 165 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 91 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 0 )" class="stroke" />
+  <path d="M 0 0.5  L 165 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 0 )" class="stroke" />
+          </svg>
+          <div id="u319_text" class="text ">
+            <p><span>账户名称</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u320" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u320.svg" id="u320_img" class="img generatedImage" viewbox="256 0 428 24">
+
+  <path d="M 1 1  L 427 1  L 427 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 256 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 0 )" class="stroke" />
+  <path d="M 0 0.5  L 428 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 0 )" class="stroke" />
+  <path d="M 427.5 1  L 427.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 0 )" class="stroke" />
+          </svg>
+          <div id="u320_text" class="text ">
+            <p><span>账户作用</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u321" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u321.svg" id="u321_img" class="img generatedImage" viewbox="0 24 91 44">
+
+  <path d="M 1 1  L 91 1  L 91 44  L 1 44  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 24 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 24 )" class="stroke" />
+  <path d="M 0 0.5  L 91 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 24 )" class="stroke" />
+          </svg>
+          <div id="u321_text" class="text ">
+            <p><span>用户账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u322" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u322.svg" id="u322_img" class="img generatedImage" viewbox="91 24 165 44">
+
+  <path d="M 1 1  L 165 1  L 165 44  L 1 44  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 91 24 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 24 )" class="stroke" />
+  <path d="M 0 0.5  L 165 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 24 )" class="stroke" />
+          </svg>
+          <div id="u322_text" class="text ">
+            <p><span>理财凭证账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u323" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u323.svg" id="u323_img" class="img generatedImage" viewbox="256 24 428 44">
+
+  <path d="M 1 1  L 427 1  L 427 44  L 1 44  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 256 24 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 24 )" class="stroke" />
+  <path d="M 0 0.5  L 428 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 24 )" class="stroke" />
+  <path d="M 427.5 1  L 427.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 24 )" class="stroke" />
+          </svg>
+          <div id="u323_text" class="text ">
+            <p><span>（需要新增）该账户用于记录用户理财类流水变动情况的镜像，意味着此账户的资产数量等于用户申购理财的资产数量，并不是真实资产</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u324" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u324.svg" id="u324_img" class="img generatedImage" viewbox="0 68 91 44">
+
+  <path d="M 1 1  L 91 1  L 91 44  L 1 44  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 68 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 68 )" class="stroke" />
+  <path d="M 0 0.5  L 91 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 68 )" class="stroke" />
+          </svg>
+          <div id="u324_text" class="text ">
+            <p><span>用户账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u325" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u325.svg" id="u325_img" class="img generatedImage" viewbox="91 68 165 44">
+
+  <path d="M 1 1  L 165 1  L 165 44  L 1 44  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 91 68 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 68 )" class="stroke" />
+  <path d="M 0 0.5  L 165 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 68 )" class="stroke" />
+          </svg>
+          <div id="u325_text" class="text ">
+            <p><span>理财账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u326" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u326.svg" id="u326_img" class="img generatedImage" viewbox="256 68 428 44">
+
+  <path d="M 1 1  L 427 1  L 427 44  L 1 44  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 256 68 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 68 )" class="stroke" />
+  <path d="M 0 0.5  L 428 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 68 )" class="stroke" />
+  <path d="M 427.5 1  L 427.5 44  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 68 )" class="stroke" />
+          </svg>
+          <div id="u326_text" class="text ">
+            <p><span>（目前已有）展示用户理财账户的资金，包括理财账户的可用余额及计息中的资金</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u327" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u327.svg" id="u327_img" class="img generatedImage" viewbox="0 112 91 24">
+
+  <path d="M 1 1  L 91 1  L 91 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 112 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 112 )" class="stroke" />
+  <path d="M 0 0.5  L 91 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 112 )" class="stroke" />
+          </svg>
+          <div id="u327_text" class="text ">
+            <p><span>用户账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u328" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u328.svg" id="u328_img" class="img generatedImage" viewbox="91 112 165 24">
+
+  <path d="M 1 1  L 165 1  L 165 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 91 112 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 112 )" class="stroke" />
+  <path d="M 0 0.5  L 165 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 112 )" class="stroke" />
+          </svg>
+          <div id="u328_text" class="text ">
+            <p><span>余额账户（资金账户）</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u329" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u329.svg" id="u329_img" class="img generatedImage" viewbox="256 112 428 24">
+
+  <path d="M 1 1  L 427 1  L 427 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 256 112 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 112 )" class="stroke" />
+  <path d="M 0 0.5  L 428 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 112 )" class="stroke" />
+  <path d="M 427.5 1  L 427.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 112 )" class="stroke" />
+          </svg>
+          <div id="u329_text" class="text ">
+            <p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">（目前已有）存储用户在</span><span style="font-family:'ArialMT', 'Arial', sans-serif;">BIB</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">系统内的正常可用余额</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u330" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u330.svg" id="u330_img" class="img generatedImage" viewbox="0 136 91 24">
+
+  <path d="M 1 1  L 91 1  L 91 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 136 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 136 )" class="stroke" />
+  <path d="M 0 0.5  L 91 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 136 )" class="stroke" />
+          </svg>
+          <div id="u330_text" class="text ">
+            <p><span>系统账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u331" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u331.svg" id="u331_img" class="img generatedImage" viewbox="91 136 165 24">
+
+  <path d="M 1 1  L 165 1  L 165 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 91 136 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 136 )" class="stroke" />
+  <path d="M 0 0.5  L 165 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 136 )" class="stroke" />
+          </svg>
+          <div id="u331_text" class="text ">
+            <p><span>定期理财收益发放账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u332" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u332.svg" id="u332_img" class="img generatedImage" viewbox="256 136 428 24">
+
+  <path d="M 1 1  L 427 1  L 427 24  L 1 24  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 256 136 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 136 )" class="stroke" />
+  <path d="M 0 0.5  L 428 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 136 )" class="stroke" />
+  <path d="M 427.5 1  L 427.5 24  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 136 )" class="stroke" />
+          </svg>
+          <div id="u332_text" class="text ">
+            <p><span>（需要新增）向用户发放定期理财本金和利息</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u333" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u333.svg" id="u333_img" class="img generatedImage" viewbox="0 160 91 24">
+
+  <path d="M 1 1  L 91 1  L 91 23  L 1 23  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 160 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 23  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 160 )" class="stroke" />
+  <path d="M 0 0.5  L 91 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 160 )" class="stroke" />
+  <path d="M 0 23.5  L 91 23.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 160 )" class="stroke" />
+          </svg>
+          <div id="u333_text" class="text ">
+            <p><span>系统账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u334" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u334.svg" id="u334_img" class="img generatedImage" viewbox="91 160 165 24">
+
+  <path d="M 1 1  L 165 1  L 165 23  L 1 23  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 91 160 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 23  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 160 )" class="stroke" />
+  <path d="M 0 0.5  L 165 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 160 )" class="stroke" />
+  <path d="M 0 23.5  L 165 23.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 91 160 )" class="stroke" />
+          </svg>
+          <div id="u334_text" class="text ">
+            <p><span>定期理财接收账户</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u335" class="ax_default transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u335.svg" id="u335_img" class="img generatedImage" viewbox="256 160 428 24">
+
+  <path d="M 1 1  L 427 1  L 427 23  L 1 23  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 256 160 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 23  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 160 )" class="stroke" />
+  <path d="M 0 0.5  L 428 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 160 )" class="stroke" />
+  <path d="M 427.5 1  L 427.5 23  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 160 )" class="stroke" />
+  <path d="M 0 23.5  L 428 23.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 256 160 )" class="stroke" />
+          </svg>
+          <div id="u335_text" class="text ">
+            <p><span>（需要新增）用来接收用户的理财申购本金</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u336" class="ax_default label transition notrs">
+        <div id="u336_div" class=""></div>
+        <div id="u336_text" class="text ">
+          <p><span>三、资金流转路径：</span></p><p><span>1.用户划转资金：从【用户-资金账户】划入【用户-理财账户】，成为可用余额</span></p><p><span>2.用户发起申购订单：【用户-理财账户】中使用的币种状态，将由【可用】变为【冻结】</span></p><p><span>3.用户撤销申购：【用户-理财账户】中使用的币种状态，将由【冻结】变为【可用】</span></p><p><span>4.申购成功：将【用户-理财账户】冻结的资金划转到【系统-定期理财接收账户】</span></p><p><span>5.每日发息/赎回成功：从【系统-定期理财收益发放账户】将本金利息转入【用户-理财账户】可用余额</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u337" class="ax_default label transition notrs">
+        <div id="u337_div" class=""></div>
+        <div id="u337_text" class="text ">
+          <p><span>用户理财账户：新增‘定期理财’类型，子类型沿用已有类型：</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Table) -->
+      <div id="u338" class="ax_default">
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u339" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u339.svg" id="u339_img" class="img generatedImage" viewbox="0 0 61 40">
+
+  <path d="M 1 1  L 61 1  L 61 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" class="stroke" />
+  <path d="M 0 0.5  L 61 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" class="stroke" />
+          </svg>
+          <div id="u339_text" class="text ">
+            <p><span>序号</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u340" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u340.svg" id="u340_img" class="img generatedImage" viewbox="61 0 81 40">
+
+  <path d="M 1 1  L 81 1  L 81 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 61 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 0 )" class="stroke" />
+  <path d="M 0 0.5  L 81 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 0 )" class="stroke" />
+          </svg>
+          <div id="u340_text" class="text ">
+            <p><span>类型</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u341" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u341.svg" id="u341_img" class="img generatedImage" viewbox="142 0 79 40">
+
+  <path d="M 1 1  L 79 1  L 79 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 142 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 0 )" class="stroke" />
+  <path d="M 0 0.5  L 79 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 0 )" class="stroke" />
+          </svg>
+          <div id="u341_text" class="text ">
+            <p><span>子类型</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u342" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u342.svg" id="u342_img" class="img generatedImage" viewbox="221 0 89 40">
+
+  <path d="M 1 1  L 89 1  L 89 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 221 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 0 )" class="stroke" />
+  <path d="M 0 0.5  L 89 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 0 )" class="stroke" />
+          </svg>
+          <div id="u342_text" class="text ">
+            <p><span>收支表达</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u343" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u343.svg" id="u343_img" class="img generatedImage" viewbox="310 0 124 40">
+
+  <path d="M 1 1  L 124 1  L 124 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 310 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 0 )" class="stroke" />
+  <path d="M 0 0.5  L 124 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 0 )" class="stroke" />
+          </svg>
+          <div id="u343_text" class="text ">
+            <p><span>状态</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u344" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u344.svg" id="u344_img" class="img generatedImage" viewbox="434 0 247 40">
+
+  <path d="M 1 1  L 246 1  L 246 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 434 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 0 )" class="stroke" />
+  <path d="M 0 0.5  L 247 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 0 )" class="stroke" />
+  <path d="M 246.5 1  L 246.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 0 )" class="stroke" />
+          </svg>
+          <div id="u344_text" class="text ">
+            <p><span>备注</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u345" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u345.svg" id="u345_img" class="img generatedImage" viewbox="0 40 61 64">
+
+  <path d="M 1 1  L 61 1  L 61 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 40 )" class="stroke" />
+  <path d="M 0 0.5  L 61 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 40 )" class="stroke" />
+  <path d="M 0 63.5  L 61 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 40 )" class="stroke" />
+          </svg>
+          <div id="u345_text" class="text " style="display:none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u346" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u346.svg" id="u346_img" class="img generatedImage" viewbox="61 40 81 64">
+
+  <path d="M 1 1  L 81 1  L 81 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 61 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 40 )" class="stroke" />
+  <path d="M 0 0.5  L 81 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 40 )" class="stroke" />
+  <path d="M 0 63.5  L 81 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 40 )" class="stroke" />
+          </svg>
+          <div id="u346_text" class="text ">
+            <p><span>定期理财</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u347" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u347.svg" id="u347_img" class="img generatedImage" viewbox="142 40 79 64">
+
+  <path d="M 1 1  L 79 1  L 79 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 142 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 40 )" class="stroke" />
+  <path d="M 0 0.5  L 79 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 40 )" class="stroke" />
+  <path d="M 0 63.5  L 79 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 40 )" class="stroke" />
+          </svg>
+          <div id="u347_text" class="text ">
+            <p><span>申购</span></p><p><span>结算本金</span></p><p><span>结算利息</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u348" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u348.svg" id="u348_img" class="img generatedImage" viewbox="221 40 89 64">
+
+  <path d="M 1 1  L 89 1  L 89 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 221 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 40 )" class="stroke" />
+  <path d="M 0 0.5  L 89 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 40 )" class="stroke" />
+  <path d="M 0 63.5  L 89 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 40 )" class="stroke" />
+          </svg>
+          <div id="u348_text" class="text ">
+            <p><span>-</span></p><p><span>+</span></p><p><span>+</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u349" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u349.svg" id="u349_img" class="img generatedImage" viewbox="310 40 124 64">
+
+  <path d="M 1 1  L 124 1  L 124 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 310 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 40 )" class="stroke" />
+  <path d="M 0 0.5  L 124 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 40 )" class="stroke" />
+  <path d="M 0 63.5  L 124 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 40 )" class="stroke" />
+          </svg>
+          <div id="u349_text" class="text ">
+            <p><span>已完成</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u350" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u350.svg" id="u350_img" class="img generatedImage" viewbox="434 40 247 64">
+
+  <path d="M 1 1  L 246 1  L 246 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 434 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+  <path d="M 0 0.5  L 247 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+  <path d="M 246.5 1  L 246.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+  <path d="M 0 63.5  L 247 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+          </svg>
+          <div id="u350_text" class="text ">
+            <p><span>新增定期理财类型，子类型不变</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u351" class="ax_default label transition notrs">
+        <div id="u351_div" class=""></div>
+        <div id="u351_text" class="text ">
+          <p><span>用户理财凭证账户：</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Table) -->
+      <div id="u352" class="ax_default">
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u353" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u339.svg" id="u353_img" class="img generatedImage" viewbox="0 0 61 40">
+
+  <path d="M 1 1  L 61 1  L 61 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" class="stroke" />
+  <path d="M 0 0.5  L 61 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" class="stroke" />
+          </svg>
+          <div id="u353_text" class="text ">
+            <p><span>序号</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u354" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u340.svg" id="u354_img" class="img generatedImage" viewbox="61 0 81 40">
+
+  <path d="M 1 1  L 81 1  L 81 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 61 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 0 )" class="stroke" />
+  <path d="M 0 0.5  L 81 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 0 )" class="stroke" />
+          </svg>
+          <div id="u354_text" class="text ">
+            <p><span>类型</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u355" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u341.svg" id="u355_img" class="img generatedImage" viewbox="142 0 79 40">
+
+  <path d="M 1 1  L 79 1  L 79 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 142 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 0 )" class="stroke" />
+  <path d="M 0 0.5  L 79 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 0 )" class="stroke" />
+          </svg>
+          <div id="u355_text" class="text ">
+            <p><span>子类型</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u356" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u342.svg" id="u356_img" class="img generatedImage" viewbox="221 0 89 40">
+
+  <path d="M 1 1  L 89 1  L 89 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 221 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 0 )" class="stroke" />
+  <path d="M 0 0.5  L 89 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 0 )" class="stroke" />
+          </svg>
+          <div id="u356_text" class="text ">
+            <p><span>收支表达</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u357" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u343.svg" id="u357_img" class="img generatedImage" viewbox="310 0 124 40">
+
+  <path d="M 1 1  L 124 1  L 124 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 310 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 0 )" class="stroke" />
+  <path d="M 0 0.5  L 124 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 0 )" class="stroke" />
+          </svg>
+          <div id="u357_text" class="text ">
+            <p><span>状态</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u358" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u344.svg" id="u358_img" class="img generatedImage" viewbox="434 0 247 40">
+
+  <path d="M 1 1  L 246 1  L 246 40  L 1 40  L 1 1  Z " fill-rule="nonzero" fill="rgba(242, 242, 242, 1)" stroke="none" transform="matrix(1 0 0 1 434 0 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 0 )" class="stroke" />
+  <path d="M 0 0.5  L 247 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 0 )" class="stroke" />
+  <path d="M 246.5 1  L 246.5 40  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 0 )" class="stroke" />
+          </svg>
+          <div id="u358_text" class="text ">
+            <p><span>备注</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u359" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u359.svg" id="u359_img" class="img generatedImage" viewbox="0 40 61 64">
+
+  <path d="M 1 1  L 61 1  L 61 64  L 1 64  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 40 )" class="stroke" />
+  <path d="M 0 0.5  L 61 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 40 )" class="stroke" />
+          </svg>
+          <div id="u359_text" class="text " style="display:none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u360" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u360.svg" id="u360_img" class="img generatedImage" viewbox="61 40 81 64">
+
+  <path d="M 1 1  L 81 1  L 81 64  L 1 64  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 61 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 40 )" class="stroke" />
+  <path d="M 0 0.5  L 81 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 40 )" class="stroke" />
+          </svg>
+          <div id="u360_text" class="text ">
+            <p><span>定期理财凭证</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u361" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u361.svg" id="u361_img" class="img generatedImage" viewbox="142 40 79 64">
+
+  <path d="M 1 1  L 79 1  L 79 64  L 1 64  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 142 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 40 )" class="stroke" />
+  <path d="M 0 0.5  L 79 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 40 )" class="stroke" />
+          </svg>
+          <div id="u361_text" class="text ">
+            <p><span>申购</span></p><p><span>结算本金</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u362" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u362.svg" id="u362_img" class="img generatedImage" viewbox="221 40 89 64">
+
+  <path d="M 1 1  L 89 1  L 89 64  L 1 64  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 221 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 40 )" class="stroke" />
+  <path d="M 0 0.5  L 89 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 40 )" class="stroke" />
+          </svg>
+          <div id="u362_text" class="text ">
+            <p><span>+</span></p><p><span>-</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u363" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u363.svg" id="u363_img" class="img generatedImage" viewbox="310 40 124 64">
+
+  <path d="M 1 1  L 124 1  L 124 64  L 1 64  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 310 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 40 )" class="stroke" />
+  <path d="M 0 0.5  L 124 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 40 )" class="stroke" />
+          </svg>
+          <div id="u363_text" class="text ">
+            <p><span>已完成</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u364" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u364.svg" id="u364_img" class="img generatedImage" viewbox="434 40 247 64">
+
+  <path d="M 1 1  L 246 1  L 246 64  L 1 64  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 434 40 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+  <path d="M 0 0.5  L 247 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+  <path d="M 246.5 1  L 246.5 64  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 40 )" class="stroke" />
+          </svg>
+          <div id="u364_text" class="text ">
+            <p><span>1、对应用户理财账户的‘定期理财’流水</span></p><p><span>2、子类型仅对应申购和结算本金，数量相等，方向相反</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u365" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u365.svg" id="u365_img" class="img generatedImage" viewbox="0 104 61 64">
+
+  <path d="M 1 1  L 61 1  L 61 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 0 104 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 104 )" class="stroke" />
+  <path d="M 0 0.5  L 61 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 104 )" class="stroke" />
+  <path d="M 0 63.5  L 61 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 0 104 )" class="stroke" />
+          </svg>
+          <div id="u365_text" class="text " style="display:none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u366" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u366.svg" id="u366_img" class="img generatedImage" viewbox="61 104 81 64">
+
+  <path d="M 1 1  L 81 1  L 81 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 61 104 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 104 )" class="stroke" />
+  <path d="M 0 0.5  L 81 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 104 )" class="stroke" />
+  <path d="M 0 63.5  L 81 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 61 104 )" class="stroke" />
+          </svg>
+          <div id="u366_text" class="text ">
+            <p><span>双币理财凭证</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u367" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u367.svg" id="u367_img" class="img generatedImage" viewbox="142 104 79 64">
+
+  <path d="M 1 1  L 79 1  L 79 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 142 104 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 104 )" class="stroke" />
+  <path d="M 0 0.5  L 79 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 104 )" class="stroke" />
+  <path d="M 0 63.5  L 79 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 142 104 )" class="stroke" />
+          </svg>
+          <div id="u367_text" class="text ">
+            <p><span>申购</span></p><p><span>结算本金</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u368" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u368.svg" id="u368_img" class="img generatedImage" viewbox="221 104 89 64">
+
+  <path d="M 1 1  L 89 1  L 89 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 221 104 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 104 )" class="stroke" />
+  <path d="M 0 0.5  L 89 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 104 )" class="stroke" />
+  <path d="M 0 63.5  L 89 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 221 104 )" class="stroke" />
+          </svg>
+          <div id="u368_text" class="text ">
+            <p><span>+</span></p><p><span>-</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u369" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u369.svg" id="u369_img" class="img generatedImage" viewbox="310 104 124 64">
+
+  <path d="M 1 1  L 124 1  L 124 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 310 104 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 104 )" class="stroke" />
+  <path d="M 0 0.5  L 124 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 104 )" class="stroke" />
+  <path d="M 0 63.5  L 124 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 310 104 )" class="stroke" />
+          </svg>
+          <div id="u369_text" class="text ">
+            <p><span>已完成</span></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (Table cell) -->
+        <div id="u370" class="ax_default table_cell transition notrs">
+          <svg data="images/4用户可以查看资产持仓、申购订单、资金流水/u370.svg" id="u370_img" class="img generatedImage" viewbox="434 104 247 64">
+
+  <path d="M 1 1  L 246 1  L 246 63  L 1 63  L 1 1  Z " fill-rule="nonzero" fill="rgba(255, 255, 255, 1)" stroke="none" transform="matrix(1 0 0 1 434 104 )" class="fill" />
+  <path d="M 0.5 1  L 0.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 104 )" class="stroke" />
+  <path d="M 0 0.5  L 247 0.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 104 )" class="stroke" />
+  <path d="M 246.5 1  L 246.5 63  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 104 )" class="stroke" />
+  <path d="M 0 63.5  L 247 63.5  " stroke-width="1" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 434 104 )" class="stroke" />
+          </svg>
+          <div id="u370_text" class="text ">
+            <p><span>1、对应用户理财账户的‘双币理财’流水</span></p><p><span>2、子类型仅对应申购和结算本金，数量相等，方向相反</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u371" class="ax_default label transition notrs">
+        <div id="u371_div" class=""></div>
+        <div id="u371_text" class="text ">
+          <p><span>四、流水类型说明：</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u372" class="ax_default label transition notrs">
+        <div id="u372_div" class=""></div>
+        <div id="u372_text" class="text ">
+          <p><span>四、用户资产统计举例：</span></p><p><span>1、期初用户资产总额100u</span></p><p><span>2、用户申购了100u的定期或者双币，真实资产划转到了系统账户，理财账户流水-100u</span></p><p><span>3、用户的凭证账户会生成一条反向的流水+100u，此时用户资产总额将仍是100u</span></p><p><span>4、用户提前赎回，结算100u，理财账户流水+100u</span></p><p><span>5、用户的凭证账户-100u</span></p><p><span>6、期末用户资产总额100u</span></p>
+        </div>
+      </div>
+    </div>
+    <script src="resources/scripts/axure/ios.js"></script>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>申购成功的判断规则</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/申购成功的判断规则/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-3.7.1.min.js"></script>
+    <script src="resources/scripts/axure/axQuery.js"></script>
+    <script src="resources/scripts/axure/globals.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/axure/annotation.js"></script>
+    <script src="resources/scripts/axure/axQuery.std.js"></script>
+    <script src="resources/scripts/axure/doc.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+    <script src="resources/scripts/axure/events.js"></script>
+    <script src="resources/scripts/axure/recording.js"></script>
+    <script src="resources/scripts/axure/action.js"></script>
+    <script src="resources/scripts/axure/expr.js"></script>
+    <script src="resources/scripts/axure/geometry.js"></script>
+    <script src="resources/scripts/axure/flyout.js"></script>
+    <script src="resources/scripts/axure/model.js"></script>
+    <script src="resources/scripts/axure/repeater.js"></script>
+    <script src="resources/scripts/axure/sto.js"></script>
+    <script src="resources/scripts/axure/utils.temp.js"></script>
+    <script src="resources/scripts/axure/variables.js"></script>
+    <script src="resources/scripts/axure/drag.js"></script>
+    <script src="resources/scripts/axure/move.js"></script>
+    <script src="resources/scripts/axure/visibility.js"></script>
+    <script src="resources/scripts/axure/style.js"></script>
+    <script src="resources/scripts/axure/adaptive.js"></script>
+    <script src="resources/scripts/axure/tree.js"></script>
+    <script src="resources/scripts/axure/init.temp.js"></script>
+    <script src="resources/scripts/axure/legacy.js"></script>
+    <script src="resources/scripts/axure/viewer.js"></script>
+    <script src="resources/scripts/axure/math.js"></script>
+    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
+    <script src="data/document.js"></script>
+    <script src="files/申购成功的判断规则/data.js"></script>
+    <script type="text/javascript">
+      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
+      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
+      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
+    </script>
+  </head>
+  <body>
+    <div id="base" class="">
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u491" class="ax_default _文本段落 transition notrs">
+        <div id="u491_div" class=""></div>
+        <div id="u491_text" class="text ">
+          <p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">申购成功的判定：</span></p><p><span style="font-family:'ArialMT', 'Arial', sans-serif;">1</span><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">、加入申购队列，产品ID分组、时间优先</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">2、产品表中已定义可申购额度、锁定中额度、已申购额度，三者相加等于产品总额度，进行轮询：</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">&nbsp; 0）产品状态为‘上架’，否则队列中订单均失败</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">&nbsp; 1）订单数量＜可申购额度，订单状态更新为‘资产划转中’，</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">锁定额度增加该部分产品额度，划转成功后订单状态更新为‘计息中’，标志已成功</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">&nbsp; 2）可申购＜订单数量＜（可申购+锁定中）</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">订单继续在队列中等待下一次轮询</span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;"><br></span></p><p><span style="font-family:'PingFangSC-Regular', 'PingFang SC', sans-serif;">&nbsp; 3）（可申购+锁定中）＜订单数量，订单进入取消流程</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u492" class="ax_default _文本段落 transition notrs">
+        <div id="u492_div" class=""></div>
+        <div id="u492_text" class="text ">
+          <p><span>字段解释：</span></p><p><span><br></span></p><p><span>可申购数量：产品总额减去用户已经申购成功的数量。</span></p><p><span><br></span></p><p><span>锁定中额度：这是一个会快速变化的值，主要在用户申购订单已被接受，资产正在个人账户转向公司账户的过程，终态为0。</span></p><p><span><br></span></p><p><span>已申购额度：该产品用户已经申购成功的数量加总</span></p>
+        </div>
+      </div>
+    </div>
+    <script src="resources/scripts/axure/ios.js"></script>
+  </body>
+</html>

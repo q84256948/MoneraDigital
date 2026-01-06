@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>6根据配置的不同会实现产品不同的效果</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/6根据配置的不同会实现产品不同的效果/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-3.7.1.min.js"></script>
+    <script src="resources/scripts/axure/axQuery.js"></script>
+    <script src="resources/scripts/axure/globals.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/axure/annotation.js"></script>
+    <script src="resources/scripts/axure/axQuery.std.js"></script>
+    <script src="resources/scripts/axure/doc.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+    <script src="resources/scripts/axure/events.js"></script>
+    <script src="resources/scripts/axure/recording.js"></script>
+    <script src="resources/scripts/axure/action.js"></script>
+    <script src="resources/scripts/axure/expr.js"></script>
+    <script src="resources/scripts/axure/geometry.js"></script>
+    <script src="resources/scripts/axure/flyout.js"></script>
+    <script src="resources/scripts/axure/model.js"></script>
+    <script src="resources/scripts/axure/repeater.js"></script>
+    <script src="resources/scripts/axure/sto.js"></script>
+    <script src="resources/scripts/axure/utils.temp.js"></script>
+    <script src="resources/scripts/axure/variables.js"></script>
+    <script src="resources/scripts/axure/drag.js"></script>
+    <script src="resources/scripts/axure/move.js"></script>
+    <script src="resources/scripts/axure/visibility.js"></script>
+    <script src="resources/scripts/axure/style.js"></script>
+    <script src="resources/scripts/axure/adaptive.js"></script>
+    <script src="resources/scripts/axure/tree.js"></script>
+    <script src="resources/scripts/axure/init.temp.js"></script>
+    <script src="resources/scripts/axure/legacy.js"></script>
+    <script src="resources/scripts/axure/viewer.js"></script>
+    <script src="resources/scripts/axure/math.js"></script>
+    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
+    <script src="data/document.js"></script>
+    <script src="files/6根据配置的不同会实现产品不同的效果/data.js"></script>
+    <script type="text/javascript">
+      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
+      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
+      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
+    </script>
+  </head>
+  <body>
+    <div id="base" class="">
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u442" class="ax_default label transition notrs">
+        <div id="u442_div" class=""></div>
+        <div id="u442_text" class="text ">
+          <p><span style="color:#000000;">一、业务逻辑：</span></p><p><span style="color:#000000;">1、运营配置产品的不同参数可以实现不同的产品效果，目前能实现的效果包括：</span></p><p><span style="color:#000000;">1）用户申购时固定每次的申购数量，限制个人申购份数</span></p><p><span style="color:#000000;">2）用户申购时限制单次最大、最小数量和个人申购上限</span></p><p><span style="color:#000000;">3）配置了‘定期理财新用户专享’标签的产品仅会展示给没有进行过理财的用户</span></p><p><span style="color:#000000;">2、</span><span>本次支持配置的理财产品是预期收益型产品，申购确认时间是用户申购发起日的第二天12：00，利率以申购确认</span></p><p><span>时的产品利率为准，到期一次还本付息，提前赎回不发放利息</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (Rectangle) -->
+      <div id="u443" class="ax_default label transition notrs">
+        <div id="u443_div" class=""></div>
+        <div id="u443_text" class="text ">
+          <p><span>二、方案：</span></p><p><span>1）用户申购时固定每次的申购数量，限制个人申购份数：</span></p><p><span>&nbsp; 通过配置单次申购最大、最小数量相等可实现每次申购数量固定，产品总额配置申购数量的倍数可实现总</span></p><p><span>份数的概念，个人申购上限配置其倍数可实现个人申购份数限制的概念。</span></p><p><span>2）用户申购时限制单次最大、最小数量和个人申购上限：</span></p><p><span>&nbsp; 正常按照需求配置单次申购最大/最小数量、产品总额、个人上限即可。</span></p><p><span>3）‘定期理财新用户专享’标签规则：</span></p><p><span>&nbsp; a.理财新用户：该用户的所有定期产品申购记录中，不存在‘待确认’‘计息中’‘赎回中’‘赎回完成’状态的订单</span></p><p><span>&nbsp; b.未登录用户可以看到所有产品，登录用户若不属于理财新用户，则只能看到没有新用户专享标签的产品</span></p><p><span>&nbsp; c.已经申购了新用户专享产品的用户，在进入产品详情页后，申购按钮变为‘已售罄’</span></p>
+        </div>
+      </div>
+    </div>
+    <script src="resources/scripts/axure/ios.js"></script>
+  </body>
+</html>
