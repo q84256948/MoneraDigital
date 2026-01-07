@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { validateRedirectPath } from "@/lib/redirect-validator";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp";
 
@@ -17,6 +18,7 @@ export default function Login() {
   const [tempUserId, setTempUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -43,7 +45,9 @@ export default function Login() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         toast.success(t("auth.login.successMessage"));
-        navigate("/");
+        // Redirect to validated returnTo or default to /dashboard
+        const returnTo = validateRedirectPath((location.state as any)?.returnTo);
+        navigate(returnTo);
         return;
       }
 
@@ -67,7 +71,9 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       toast.success(t("auth.login.successMessage"));
-      navigate("/");
+      // Redirect to validated returnTo or default to /dashboard
+      const returnTo = validateRedirectPath((location.state as any)?.returnTo);
+      navigate(returnTo);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
