@@ -1,0 +1,1210 @@
+# 系统设计文档：定期理财账户系统与数据库设计
+
+## 一、 设计原则
+
+1.  **KISS (Keep It Simple, Stupid)**: 
+    *   不引入过度复杂的分布式事务框架（如 Seata），利用数据库本地事务保证资金原子性。
+    *   表结构设计直观，避免过度的 JOIN 查询。
+2.  **高内聚 (High Cohesion)**:
+    *   **账户域**：只负责“记账”和“余额变更”，不关心钱是用来买理财还是买比特币。
+    *   **理财域**：只负责产品规则、计息逻辑和订单状态，涉及资金变动时调用账户域服务。
+3.  **低耦合 (Low Coupling)**:
+    *   理财业务通过标准的“转账指令”与账户系统交互。账户系统不对理财业务有任何依赖。
+4.  **安全性**:
+    *   所有金额字段使用 `DECIMAL` 类型。
+    *   余额变更必须通过乐观锁（CAS）机制防止并发超扣。
+    *   资金流水（Journal）不可篡改，作为对账的唯一依据。
+
+---
+
+## 二、 系统架构概览
+
+系统逻辑上分为两个核心模块：
+
+1.  **资产账户中心 (Asset Account Center)**: 
+    *   管理用户资金账户（FUND）和理财账户（WEALTH）。
+    *   提供统一的 `transfer(from, to, amount, type)` 接口。
+    *   核心职责：**管钱**。
+2.  **理财业务中心 (Wealth Service)**:
+    *   管理产品上架、申购、赎回、自动续期。
+    *   核心职责：**管订单**。
+
+---
+
+## 三、 数据库设计 (Schema Design)
+
+### 1. 资产账户中心 (Asset Domain)
+
+此部分表结构通用，不仅服务于理财，未来可服务于交易、借贷等。
+
+#### 1.1 `account` (用户资产账户表)
+记录用户在不同业务线下的资金余额。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | 账户ID |
+| `user_id` | BIGINT | UK_1 | 用户ID |
+| `type` | VARCHAR(16) | UK_1 | 账户类型: `FUND`(资金/现货), `WEALTH`(理财) |
+| `currency` | VARCHAR(8) | UK_1 | 币种: `USDT`, `BTC` |
+| `balance` | DECIMAL(32,16) | Not Null | **可用余额** (核心资产) |
+| `frozen` | DECIMAL(32,16) | Not Null | 冻结金额 (用于挂单或处理中状态) |
+| `version` | BIGINT | Not Null | **乐观锁版本号** (每次变更+1) |
+| `created_at` | DATETIME | | |
+| `updated_at` | DATETIME | | |
+
+> **精妙之处**：通过 `version` 字段实现乐观锁，更新语句如 `UPDATE account SET balance = balance - ?, version = version + 1 WHERE id = ? AND version = ? AND balance >= ?`，无需数据库行锁等待，性能高且绝对安全。
+
+#### 1.2 `account_journal` (资金流水表/总账表)
+资金流动的不可变记录，采用**复式记账**思想的简化版（单边流水，但关联来源）。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | 流水ID |
+| `serial_no` | VARCHAR(64) | UK | 全局唯一的业务流水号 (幂等性键) |
+| `user_id` | BIGINT | Index | 用户ID (冗余字段，方便查询) |
+| `account_id` | BIGINT | Index | 变动的账户ID |
+| `amount` | DECIMAL(32,16) | Not Null | 变动金额 (正数表示增加，负数表示减少) |
+| `balance_snapshot`| DECIMAL(32,16) | Not Null | 变动后的余额快照 (用于快速对账) |
+| `biz_type` | VARCHAR(32) | | 业务类型: `TRANSFER_IN`, `SUBSCRIBE_DEDUCT`(申购扣款), `REDEEM_ADD`(赎回入账), `INTEREST`(派息) |
+| `ref_id` | BIGINT | | 关联业务ID (如 `wealth_order.id`) |
+| `created_at` | DATETIME | | |
+
+---
+
+### 2. 理财业务中心 (Wealth Domain)
+
+#### 2.1 `wealth_product` (理财产品配置表)
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | 产品ID |
+| `title` | VARCHAR(128)| | 产品名称 (如 "USDT 7日高息") |
+| `currency` | VARCHAR(8) | | 申购币种 |
+| `apy` | DECIMAL(10,4) | | 年化收益率 (如 0.0700 表示 7%) |
+| `duration` | INT | | 期限 (天) |
+| `min_amount` | DECIMAL(20,8) | | 起购金额 |
+| `max_amount` | DECIMAL(20,8) | | 单人限额 |
+| `total_quota` | DECIMAL(20,8) | | 总额度 |
+| `sold_quota` | DECIMAL(20,8) | | 已售额度 (乐观锁更新) |
+| `status` | TINYINT | | 状态: 1-待上架, 2-募集中, 3-已售罄, 4-已结束 |
+| `auto_renew_allowed`| TINYINT | | 是否允许自动续期: 0-否, 1-是 |
+
+#### 2.2 `wealth_order` (理财申购订单表)
+记录用户与产品的契约关系。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | 订单ID |
+| `user_id` | BIGINT | Index | 用户ID |
+| `product_id` | BIGINT | Index | 产品ID |
+| `amount` | DECIMAL(32,16) | | 申购本金 |
+| `principal_redeemed`| DECIMAL(32,16)| | 已赎回本金 (通常等于 amount，除非支持部分赎回) |
+| `interest_expected` | DECIMAL(32,16) | | 预期总利息 (快照字段，申购时计算好) |
+| `interest_paid` | DECIMAL(32,16) | | 已派发利息 |
+| `start_date` | DATE | | 起息日 |
+| `end_date` | DATE | Index | 到期赎回日 (用于定时任务扫描) |
+| `auto_renew` | TINYINT | | 是否开启自动续期 |
+| `status` | TINYINT | Index | 0-处理中, 1-持有中(计息), 2-已赎回/结束, 3-失败 |
+| `created_at` | DATETIME | | 申购时间 |
+
+#### 2.3 `wealth_interest_record` (每日计息/发放记录表)
+用于记录每日产生的利息，或最终发放的利息流水。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | |
+| `order_id` | BIGINT | Index | 关联订单 |
+| `amount` | DECIMAL(32,16) | | 当次产生/发放的利息 |
+| `type` | TINYINT | | 1-每日计提(仅记录), 2-实际发放(入账) |
+| `date` | DATE | | 归属日期 |
+
+---
+
+### 3. 幂等性与重复提交防护 (Idempotency Control)
+
+#### 3.1 `idempotency_record` (幂等性记录表 - **P0 关键修复**)
+
+防止重复提交导致的多笔扣款。用于订购、划转等所有资金操作。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | 记录ID |
+| `user_id` | BIGINT | Index | 用户ID |
+| `request_id` | VARCHAR(128) | UK_1 | 客户端生成的唯一请求ID (UUID) |
+| `biz_type` | VARCHAR(32) | UK_1 | 业务类型: `SUBSCRIBE`, `TRANSFER`, `REDEEM` |
+| `status` | ENUM | | `PROCESSING` (处理中), `SUCCESS` (成功), `FAILED` (失败) |
+| `result_data` | JSON | | 成功时返回的结果数据（如 order_id） |
+| `error_message` | VARCHAR(255) | | 失败时的错误信息 |
+| `created_at` | DATETIME | | 请求创建时间 |
+| `completed_at` | DATETIME | | 请求完成时间 |
+| `ttl_expire_at` | DATETIME | | 记录过期时间（同一 request_id 的幂等性保证周期，通常为 24 小时） |
+
+> **设计原理**：
+> - 相同 user_id + request_id + biz_type 的请求视为幂等操作
+> - 若 PROCESSING 状态超过 30 秒未更新，前端可重新发起请求（新的 request_id）
+> - 过期记录每日清理（TTL）
+
+#### 3.2 `wallet_creation_request` (Safeheron 钱包创建请求表 - **P0 关键修复**)
+
+防止重复向 Safeheron 创建钱包账户。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | |
+| `user_id` | BIGINT | UK | 用户ID（唯一，同一用户只能创建一次） |
+| `request_id` | VARCHAR(128) | UK | 本次创建请求ID |
+| `status` | ENUM | | `PENDING`, `CREATING`, `SUCCESS`, `FAILED` |
+| `safeheron_wallet_id` | VARCHAR(128) | | Safeheron 返回的钱包ID |
+| `coin_address` | VARCHAR(256) | | 生成的区块链地址 |
+| `error_message` | VARCHAR(255) | | 创建失败的原因 |
+| `retry_count` | INT | | 重试次数 |
+| `created_at` | DATETIME | | |
+| `updated_at` | DATETIME | | |
+
+> **设计原理**：
+> - 同一用户在短时间内多次点击"开通"，使用同一 request_id 进行重试
+> - 如果该用户已有 SUCCESS 记录，直接返回已有的 wallet_id 和地址
+> - 避免在 Safeheron 侧创建重复的钱包
+
+#### 3.3 `transfer_record` (划转记录表 - **P0 关键修复**)
+
+用于追踪用户资金账户与理财账户间的划转，提供完整的操作链路。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | |
+| `user_id` | BIGINT | Index | 用户ID |
+| `transfer_id` | VARCHAR(64) | UK | 全局唯一划转ID（业务维度） |
+| `from_account_id` | BIGINT | | 转出账户ID |
+| `to_account_id` | BIGINT | | 转入账户ID |
+| `amount` | DECIMAL(32,16) | | 划转金额 |
+| `status` | ENUM | | `PENDING`, `SUCCESS`, `FAILED` |
+| `created_at` | DATETIME | | |
+| `completed_at` | DATETIME | | |
+
+> **设计原理**：
+> - transfer_id 由前端生成并传递，便于业务方追踪
+> - 幂等性：相同 transfer_id 的请求返回同样结果
+
+#### 3.4 `system_account` (系统账户表 - **P0 关键修复：账务闭环**)
+
+用于实现完整的复式记账，确保所有用户的资金变动都有对手方账户。
+
+| 字段名 | 类型 | 属性 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | |
+| `user_id` | BIGINT | UK_1 | 系统账户固定为 user_id = -1（特殊账户） |
+| `type` | VARCHAR(16) | UK_1 | 账户类型: `SYSTEM_WEALTH` (理财汇聚账户) |
+| `currency` | VARCHAR(8) | UK_1 | 币种: `USDT`, `BTC` |
+| `balance` | DECIMAL(32,16) | Not Null | 系统账户余额（所有用户理财账户总和） |
+| `frozen` | DECIMAL(32,16) | Not Null | 冻结余额 |
+| `version` | BIGINT | Not Null | 乐观锁版本号 |
+| `created_at` | DATETIME | | |
+| `updated_at` | DATETIME | | |
+
+> **重要**：
+> - 系统账户与用户账户必须实时对账平衡
+> - 所有用户理财账户余额之和 = 系统账户（SYSTEM_WEALTH）余额
+> - 如不平衡，系统立即告警并冻结理财业务
+
+---
+
+## 四、 核心业务流程设计
+
+### 1. 申购流程 (Subscription) - **P0 修复：并发超卖防护**
+
+此流程为**高并发**敏感场景，设计重点在于防止超卖和资金安全。
+
+#### 1.1 幂等性检查与重复提交防护
+
+```sql
+-- 第一步：检查幂等性
+SELECT * FROM idempotency_record
+WHERE user_id = :uid AND request_id = :req_id AND biz_type = 'SUBSCRIBE'
+
+IF 记录存在:
+  IF status = 'SUCCESS':
+    返回已有的 result_data (order_id等)
+  ELSE IF status = 'PROCESSING':
+    返回 "订单处理中，请稍候" (防止重复操作)
+  ELSE IF status = 'FAILED':
+    可允许用户重新提交（新 request_id）
+ELSE:
+  继续后续流程，创建 PROCESSING 状态的幂等记录
+```
+
+#### 1.2 申购核心流程（带 SELECT FOR UPDATE）
+
+**步骤逻辑**：
+
+1.  **开启数据库事务 (Transaction Start) - 隔离级别：REPEATABLE_READ 或 SERIALIZABLE**
+
+2.  **幂等性记录初始化**:
+    ```sql
+    INSERT INTO idempotency_record
+    (user_id, request_id, biz_type, status, created_at)
+    VALUES (:uid, :req_id, 'SUBSCRIBE', 'PROCESSING', NOW())
+    ```
+
+3.  **使用 SELECT FOR UPDATE 锁定账户行（防止并发冲突）**:
+    ```sql
+    SELECT id, balance, version
+    FROM account
+    WHERE user_id = :uid AND type = 'WEALTH' AND currency = :cur
+    FOR UPDATE
+
+    -- 检查余额
+    IF balance < :amount:
+      抛出异常 "余额不足"，更新幂等记录状态为 FAILED
+    ```
+
+4.  **同时锁定产品行（防止超卖）**:
+    ```sql
+    SELECT id, sold_quota, total_quota
+    FROM wealth_product
+    WHERE id = :pid
+    FOR UPDATE
+
+    -- 检查额度
+    IF (sold_quota + :amount) > total_quota:
+      抛出异常 "产品额度不足"，更新幂等记录状态为 FAILED
+    ```
+
+5.  **扣减理财账户余额（乐观锁机制）**:
+    ```sql
+    UPDATE account
+    SET balance = balance - :amount, version = version + 1
+    WHERE id = :account_id AND version = :current_version
+
+    IF rows_affected = 0:
+      -- 并发冲突（版本号不匹配），抛出异常回滚
+      抛出异常 "并发冲突，请重试"
+    ELSE:
+      保存新的 version 号
+    ```
+
+6.  **扣减产品额度**:
+    ```sql
+    UPDATE wealth_product
+    SET sold_quota = sold_quota + :amount
+    WHERE id = :pid AND (sold_quota + :amount) <= total_quota
+
+    IF rows_affected = 0:
+      -- 额度被其他请求抢占，抛出异常回滚
+      抛出异常 "产品已售罄"
+    ```
+
+7.  **同时向系统账户加钱（P0 修复：账务闭环）**:
+    ```sql
+    UPDATE account
+    SET balance = balance + :amount, version = version + 1
+    WHERE user_id = -1 AND type = 'SYSTEM_WEALTH' AND currency = :cur
+
+    IF rows_affected = 0:
+      抛出异常 "系统账户异常"
+    ```
+
+8.  **创建订单**:
+    ```sql
+    INSERT INTO wealth_order
+    (user_id, product_id, amount, interest_expected, status, start_date, end_date, created_at)
+    VALUES (:uid, :pid, :amount, :interest_calc, 0, CURDATE(), DATE_ADD(CURDATE(), INTERVAL product.duration DAY), NOW())
+
+    -- 获取生成的 order_id
+    ```
+
+9.  **记录双向流水**:
+    ```sql
+    -- 用户账户的扣款流水
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), :uid, :user_account_id, -:amount, :new_balance, 'SUBSCRIBE_DEDUCT', :order_id, NOW())
+
+    -- 系统账户的入款流水
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), -1, :system_account_id, :amount, :system_new_balance, 'SUBSCRIBE_CREDIT', :order_id, NOW())
+    ```
+
+10. **更新幂等性记录**:
+    ```sql
+    UPDATE idempotency_record
+    SET status = 'SUCCESS',
+        result_data = JSON_OBJECT('order_id', :order_id, 'amount', :amount),
+        completed_at = NOW()
+    WHERE user_id = :uid AND request_id = :req_id
+    ```
+
+11. **提交事务 (Transaction Commit)**
+
+> **P0 修复说明**：
+> - 使用 `SELECT FOR UPDATE` 在读阶段就锁定账户和产品行，确保两个 UPDATE 间无竞态条件
+> - 虽然性能略低于纯乐观锁，但在金融系统中**安全性优先于性能**
+> - 锁定时间极短（仅在事务内），不会导致长期阻塞
+> - 采用乐观锁 + SELECT FOR UPDATE 的混合方案：可靠性高，性能可接受
+> - **系统账户同步更新**确保账务永远平衡
+> - **幂等性记录**防止网络超时导致的重复提交
+
+### 2. 资金划转流程 (Transfer) - **P0 修复：幂等性保证**
+
+用户将资金从"资金账户"划转到"理财账户"。
+
+#### 2.1 幂等性检查
+
+```sql
+-- 检查划转记录
+SELECT * FROM transfer_record
+WHERE user_id = :uid AND transfer_id = :transfer_id
+
+IF 记录存在:
+  IF status = 'SUCCESS':
+    返回已有的结果（不重复扣款）
+  ELSE IF status = 'PENDING':
+    返回 "划转处理中，请稍候"
+  ELSE IF status = 'FAILED':
+    允许用户重新发起（新 transfer_id）
+```
+
+#### 2.2 核心划转流程
+
+**步骤逻辑**:
+
+1.  **开启事务 (REPEATABLE_READ 隔离级别)**
+
+2.  **创建划转记录（初始化为 PENDING）**:
+    ```sql
+    INSERT INTO transfer_record
+    (user_id, transfer_id, from_account_id, to_account_id, amount, status, created_at)
+    VALUES (:uid, :transfer_id, :fund_account_id, :wealth_account_id, :amount, 'PENDING', NOW())
+    ```
+
+3.  **锁定并检查资金账户余额**:
+    ```sql
+    SELECT id, balance, version
+    FROM account
+    WHERE id = :fund_account_id
+    FOR UPDATE
+
+    IF balance < :amount:
+      更新 transfer_record 状态为 FAILED，抛出异常 "资金账户余额不足"
+    ```
+
+4.  **转出 (Debit) - 从资金账户**:
+    ```sql
+    UPDATE account
+    SET balance = balance - :amount, version = version + 1
+    WHERE id = :fund_account_id AND version = :current_fund_version
+
+    IF rows_affected = 0:
+      抛出异常 "并发冲突，请重试"
+    ```
+
+5.  **记录资金账户流水**:
+    ```sql
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), :uid, :fund_account_id, -:amount, :new_fund_balance, 'TRANSFER_OUT', NULL, NOW())
+    ```
+
+6.  **转入 (Credit) - 到理财账户**:
+    ```sql
+    UPDATE account
+    SET balance = balance + :amount, version = version + 1
+    WHERE id = :wealth_account_id AND version = :current_wealth_version
+
+    IF rows_affected = 0:
+      抛出异常 "并发冲突，请重试"
+    ```
+
+7.  **记录理财账户流水**:
+    ```sql
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), :uid, :wealth_account_id, :amount, :new_wealth_balance, 'TRANSFER_IN', NULL, NOW())
+    ```
+
+8.  **更新划转记录状态**:
+    ```sql
+    UPDATE transfer_record
+    SET status = 'SUCCESS', completed_at = NOW()
+    WHERE user_id = :uid AND transfer_id = :transfer_id
+    ```
+
+9.  **提交事务 (Transaction Commit)**
+
+> **P0 修复说明**：
+> - 每个划转操作都有唯一的 `transfer_id`，由前端生成
+> - 相同 `transfer_id` 的请求幂等：第二次请求直接返回第一次的结果
+> - `transfer_record` 表记录了完整的划转链路，便于对账和审计
+> - 异常情况下（网络中断），用户可在划转记录页面查询状态
+
+### 3. 到期赎回与派息流程 (Redemption) - **P0 修复：系统账户同步**
+
+通常由定时任务（Scheduled Job）触发，扫描 `end_date = Today` 的订单。
+
+#### 3.1 赎回流程（含系统账户结算）
+
+1.  **扫描到期订单**:
+    ```sql
+    SELECT * FROM wealth_order
+    WHERE status = 1 AND end_date = CURDATE()
+    ORDER BY id ASC
+    LIMIT 1000  -- 避免单次扫描过多，分批处理
+    ```
+
+2.  **对每笔订单，开启独立事务**:
+
+3.  **计算本息**:
+    ```
+    Total = amount + interest_expected
+    ```
+
+4.  **更新订单状态**:
+    ```sql
+    UPDATE wealth_order
+    SET status = 2, updated_at = NOW()
+    WHERE id = :order_id
+    ```
+
+5.  **从系统账户扣款（P0 修复：账务闭环）**:
+    ```sql
+    SELECT id, balance, version
+    FROM account
+    WHERE user_id = -1 AND type = 'SYSTEM_WEALTH' AND currency = :cur
+    FOR UPDATE
+
+    IF balance < :total:
+      告警：系统账户余额不足（严重问题），暂停赎回
+      ROLLBACK
+      EXIT
+    ```
+
+6.  **理财账户加钱**:
+    ```sql
+    UPDATE account
+    SET balance = balance + :total, version = version + 1
+    WHERE user_id = :uid AND type = 'WEALTH' AND currency = :cur
+
+    IF rows_affected = 0:
+      ROLLBACK
+      EXIT
+    ```
+
+7.  **系统账户扣款**:
+    ```sql
+    UPDATE account
+    SET balance = balance - :total, version = version + 1
+    WHERE user_id = -1 AND type = 'SYSTEM_WEALTH' AND currency = :cur
+
+    IF rows_affected = 0:
+      告警：系统账户异常
+      ROLLBACK
+      EXIT
+    ```
+
+8.  **记录流水**:
+    ```sql
+    -- 本金流水
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), :uid, :wealth_account_id, :amount, ..., 'REDEEM_PRINCIPAL', :order_id, NOW())
+
+    -- 利息流水
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), :uid, :wealth_account_id, :interest_expected, ..., 'INTEREST_PAYOUT', :order_id, NOW())
+
+    -- 系统账户流水
+    INSERT INTO account_journal
+    (serial_no, user_id, account_id, amount, balance_snapshot, biz_type, ref_id, created_at)
+    VALUES (UUID(), -1, :system_account_id, -:total, ..., 'REDEEM_DEBIT', :order_id, NOW())
+    ```
+
+9.  **提交事务 (Transaction Commit)**
+
+> **P0 修复说明**：
+> - 系统账户与用户账户实时同步，确保账务永不失衡
+> - 如系统账户不足，立即告警并暂停赎回（避免透支）
+> - 大批量赎回时可使用消息队列异步处理，但单笔赎回仍需原子性保证
+
+---
+
+## 五、 关键设计决策 (Q&A)
+
+**Q1: 为什么不把理财产品的余额直接加在用户的 `WEALTH` 账户余额里？**
+*   **A**: 遵循**会计原则**。申购定期理财意味着你将“现金”交换成了“理财凭证（资产）”。你的现金余额确实减少了，但你的总资产（Net Worth）没变。如果在 `account` 表里保留余额，会导致用户误以为这笔钱还能拿去买别的或提现，造成双花风险。
+
+**Q2: 为什么需要 `account_journal` 表？只有 `account` 表不行吗？**
+*   **A**: 绝对不行。`account` 只是当前状态的快照。如果没有流水表，一旦出现账目不平（如系统Bug导致），将无法追溯是哪一笔交易出了问题。流水表是财务系统的"黑匣子"，用于对账和审计。
+
+**Q2.5: 利息如何派发？支持部分赎回吗？** ⚠️ **P1 详细设计**
+*   **A (利息派发流程 - P1 新增)**：
+
+    **利息时间线**：
+    ```
+    T 日：用户申购
+      ↓
+    T+1 日 00:00：起息日开始计提利息
+      ↓
+    T+1 ~ T+N 日：每日 00:00 自动计提当日利息（记录，不入账）
+      入账在：wealth_interest_record (type = 1, 仅计提)
+      ↓
+    T+N 日 23:59:59：锁定总利息（不再计提）
+      利息已实现，确认金额 = interest_expected
+      ↓
+    T+N+1 日 00:00：赎回日，执行本息到账
+      1. 本金入账：user_wealth_account + principal
+      2. 利息入账：user_wealth_account + interest_expected
+      3. 系统账户扣款：system_account - (principal + interest_expected)
+      4. 记录流水（REDEEM_PRINCIPAL 和 INTEREST_PAYOUT）
+    ```
+
+    **每日计息脚本**（定时任务 23:59 执行）：
+    ```sql
+    -- 对所有进行中的订单计算当日利息
+    SELECT order_id, amount, apy, start_date
+    FROM wealth_order wo
+    JOIN wealth_product wp ON wo.product_id = wp.id
+    WHERE wo.status = 1  -- 持有中
+
+    -- 计算当日利息
+    days_held = DATEDIFF(CURDATE(), start_date)
+    IF days_held >= 1 AND days_held <= duration:
+      daily_interest = amount * apy / 365
+      interest_accumulated = daily_interest  -- 每日固定
+
+      -- 记录每日计息（仅统计，不入账）
+      INSERT INTO wealth_interest_record (
+        order_id, amount, type, date
+      ) VALUES (
+        :order_id, :daily_interest, 1, CURDATE()
+      )
+
+    -- 如果到期日，锁定总利息
+    IF CURDATE() = end_date:
+      UPDATE wealth_order
+      SET interest_expected = SUM(daily_interest from 日期范围),
+          status = 2  -- 标记为待赎回
+    ```
+
+    **赎回日的利息入账**：
+    ```sql
+    -- 到期日后的赎回流程中
+    SELECT SUM(interest) INTO :total_interest
+    FROM wealth_interest_record
+    WHERE order_id = :order_id AND type = 1
+
+    -- 用户账户加利息
+    UPDATE account
+    SET balance = balance + :total_interest
+    WHERE user_id = :uid
+
+    -- 记录利息流水
+    INSERT INTO account_journal VALUES (
+      ..., amount = :total_interest,
+      biz_type = 'INTEREST_PAYOUT', ref_id = :order_id
+    )
+
+    -- 标记已派发
+    UPDATE wealth_interest_record
+    SET type = 2  -- 已发放
+    WHERE order_id = :order_id
+    ```
+
+*   **A (部分赎回支持 - P1 新增)**：
+    > 当前版本**不支持部分赎回**。如需未来支持，需补充以下设计：
+
+    ```sql
+    -- 扩展字段（未来使用）
+    ALTER TABLE wealth_order ADD COLUMN (
+      principal_total DECIMAL(32,16),      -- 原始本金
+      principal_redeemed DECIMAL(32,16),   -- 已赎回本金
+      interest_total DECIMAL(32,16),       -- 总利息
+      interest_redeemed DECIMAL(32,16)     -- 已赎回利息
+    );
+
+    -- 部分赎回时的利息分配规则
+    IF 支持部分赎回:
+      redeem_ratio = redeemed_principal / principal_total
+      redeem_interest = interest_total * redeem_ratio
+      -- 例：申购本金 1000，已赚利息 100，赎回 600
+      -- 则获得利息 = 100 * (600/1000) = 60
+    ```
+
+    **当前建议**：先实现"全额赎回"版本上线，后续根据用户需求再支持部分赎回（涉及复杂的利息分配算法）。
+
+**Q3: 如何处理自动续期（Auto-Subscribe）？** ⚠️ **P1 详细设计**
+*   **A (基础逻辑)**：在"到期赎回"的逻辑中增加判断。如果 `auto_renew = 1`，则不执行"理财账户加钱"的操作，而是将这笔本息直接作为新订单的本金，插入一条新的 `wealth_order`，并将旧订单状态更新为 `RENEWED`。这样避免了资金回到余额又立即扣除的冗余流水。
+
+*   **A (P1 详细设计 - 状态机 & 失败处理)**：
+
+    **订单状态机**：
+    ```
+    HOLDING (持有中)
+        ↓
+    END_DATE_REACHED (到期日期)
+        ↓
+    AUTO_RENEW_CHECK (检查是否自动续期)
+        ├─→ auto_renew = 0 → REDEEM (赎回)
+        └─→ auto_renew = 1 → RENEW_PROCESSING (续期处理中)
+                ↓
+            RENEW_SUCCESS (续期成功 → 新订单已创建)
+            或
+            RENEW_FAILED (续期失败 → 降级为赎回)
+
+    REDEEM (赎回完成，本息已入账)
+        ↓
+    CLOSED (结束)
+    ```
+
+    **自动续期详细流程**（P1 新增）：
+
+    1. **到期检查**：
+       ```sql
+       SELECT * FROM wealth_order
+       WHERE status = 1 AND end_date = CURDATE() AND auto_renew = 1
+       ```
+
+    2. **检查产品状态（P1 关键）**：
+       ```sql
+       SELECT status, sold_quota, total_quota
+       FROM wealth_product WHERE id = :pid
+
+       IF status NOT IN (2, 3):  -- 2=募集中, 3=已售罄
+         -- 产品已下架或已结束，无法续期
+         → 降级为赎回（本息转入用户账户）
+         → 标记订单为 REDEEM_FALLBACK
+         → 发送消息通知用户："产品已下架，已将本息转入账户"
+
+       IF (sold_quota + amount + interest) > total_quota:
+         -- 产品额度不足，无法续期
+         → 降级为赎回
+         → 标记订单为 REDEEM_FALLBACK
+         → 发送消息通知用户："产品额度不足，已将本息转入账户"
+       ```
+
+    3. **创建续期订单（P1 新增字段）**：
+       ```sql
+       INSERT INTO wealth_order (
+         user_id, product_id, amount,
+         principal_redeemed, interest_expected, interest_paid,
+         start_date, end_date, auto_renew,
+         status,
+         renewed_from_order_id,  -- P1 新增：链接原订单
+         created_at
+       ) VALUES (
+         :uid, :pid, :principal + :interest,  -- 本息一起续期
+         0, :new_interest_calc, 0,
+         CURDATE(), DATE_ADD(CURDATE(), INTERVAL :duration DAY),
+         :auto_renew,
+         0,  -- 处理中
+         :old_order_id,  -- 链接原订单
+         NOW()
+       )
+       ```
+
+    4. **更新旧订单状态**：
+       ```sql
+       UPDATE wealth_order
+       SET status = 4,  -- 4 = RENEWED（已续期）
+           renewed_to_order_id = :new_order_id  -- P1 新增：反向链接
+       WHERE id = :old_order_id
+       ```
+
+    5. **记录续期流水**：
+       ```sql
+       -- 记录本息的出账流水
+       INSERT INTO account_journal VALUES (
+         ..., biz_type = 'RENEW_DEDUCT', ref_id = :old_order_id, ...
+       )
+       -- 记录新订单的入账流水
+       INSERT INTO account_journal VALUES (
+         ..., biz_type = 'RENEW_CREDIT', ref_id = :new_order_id, ...
+       )
+       ```
+
+    6. **失败处理（P1 关键）**：
+       ```sql
+       如果创建新订单失败（约束冲突、金额溢出等）：
+         UPDATE wealth_order SET status = 3  -- 3 = FAILED（续期失败）
+         → 降级：将本息转入用户账户（REDEEM_FALLBACK）
+         → 告警：自动续期失败，需人工检查
+       ```
+
+    **P1 新增字段**（wealth_order 表）：
+    ```sql
+    ALTER TABLE wealth_order ADD COLUMN (
+      renewed_from_order_id BIGINT,     -- 续期来源的订单（如果是续期产品）
+      renewed_to_order_id BIGINT,       -- 续期到的新订单
+      INDEX idx_renewed_from (renewed_from_order_id),
+      INDEX idx_renewed_to (renewed_to_order_id)
+    );
+    ```
+
+    **用户消息通知（P1 新增）**：
+    ```
+    自动续期成功：
+      "您的 [产品名] 已于 [日期] 自动续期，新订单号 [order_id]，
+       本期本息已作为本金继续投资，预期收益 [amount]"
+
+    自动续期失败（产品下架）：
+      "您的 [产品名] 已到期，因产品已下架，未能自动续期。
+       本期本息已转入理财账户，请重新选择产品申购"
+
+    自动续期失败（额度不足）：
+      "您的 [产品名] 已到期，因产品额度已售罄，未能自动续期。
+       本期本息已转入理财账户，请稍后重试或选择其他产品"
+    ```
+
+**Q4: 系统理财池账户在哪里？** ⚠️ **P0 必须实现**
+*   **A (原设计，已驳回)**：上述设计中隐藏了系统对手方账户...可以省略系统账户的实时记账...
+*
+*   **A (P0 修复，强制执行)**：
+    - ✅ **系统账户是强制要求，不可省略**（合规与审计必需）
+    - ✅ 必须创建 user_id = -1 的系统账户（type = 'SYSTEM_WEALTH'）
+    - ✅ 所有用户申购时，同时向系统账户加钱
+    - ✅ 用户赎回时，从系统账户扣钱
+    - ✅ **账务永远平衡**：Σ(用户理财账户余额) = 系统账户余额
+    - ✅ **如果失衡，系统立即告警并冻结所有理财业务**（关键保护机制）
+    - 这是复式记账的必要条件，也是金融监管的强制要求
+
+---
+
+## 七、 权限控制与审核流程 (P1 新增：Role-Based Access Control)
+
+### 1. 角色定义
+
+| 角色 | 权限范围 | 责任 |
+|-----|--------|------|
+| **superadmin** | 系统全部操作 | 系统维护、配置、应急处置 |
+| **product_manager** | 产品配置、上架/下架 | 产品上架、费率调整、活动配置 |
+| **finance_admin** | 财务操作、发放利息 | 利息派发审核、对账确认、手动调账 |
+| **risk_officer** | 风险监控、用户冻结 | 异常交易监控、用户冻结、额度管理 |
+| **compliance** | 合规审查、数据导出 | 审计数据导出、合规报告、监管协作 |
+| **support** | 用户支持、订单查询 | 用户咨询、订单查询、投诉处理 |
+
+### 2. 权限矩阵
+
+```
+┌──────────────────────────┬──────────┬────────────┬─────────┬───────────┬──────────┬──────────┐
+│ 操作                     │superadmin│product_mgr │finance  │risk_off   │compliance│support   │
+├──────────────────────────┼──────────┼────────────┼─────────┼───────────┼──────────┼──────────┤
+│ 产品上架                 │    ✓     │     ✓      │    ✗    │    ✗      │    ✗     │    ✗     │
+│ 产品下架                 │    ✓     │     ✓      │    ✗    │    ✗      │    ✗     │    ✗     │
+│ 调整产品利率             │    ✓     │     ✓      │    ✗    │    ✗      │    ✗     │    ✗     │
+│ 派发利息                 │    ✓     │     ✗      │    ✓    │    ✗      │    ✗     │    ✗     │
+│ 手动调账                 │    ✓     │     ✗      │    ✓    │    ✗      │    ✗     │    ✗     │
+│ 冻结/解冻用户账户       │    ✓     │     ✗      │    ✗    │    ✓      │    ✗     │    ✗     │
+│ 调整用户额度             │    ✓     │     ✗      │    ✗    │    ✓      │    ✗     │    ✗     │
+│ 业务冻结/解冻            │    ✓     │     ✗      │    ✗    │    ✗      │    ✗     │    ✗     │
+│ 数据导出（财务报表）    │    ✓     │     ✗      │    ✓    │    ✗      │    ✓     │    ✗     │
+│ 查询订单记录             │    ✓     │     ✓      │    ✓    │    ✓      │    ✓     │    ✓     │
+│ 查询用户资金流水         │    ✓     │     ✗      │    ✓    │    ✗      │    ✓     │    ✓     │
+│ 手动处理投诉             │    ✓     │     ✗      │    ✗    │    ✗      │    ✗     │    ✓     │
+└──────────────────────────┴──────────┴────────────┴─────────┴───────────┴──────────┴──────────┘
+```
+
+### 3. 审核工作流（P1 新增）
+
+#### 3.1 产品上架审核流程
+
+```
+产品经理创建产品
+  ↓
+状态：PENDING_REVIEW (待审核)
+  ↓
+Finance Admin 审核（检查利率合理性）
+  ├─→ 不同意 → 状态改为 REJECTED
+  └─→ 同意 → 状态改为 APPROVED
+  ↓
+Risk Officer 审核（检查风险额度）
+  ├─→ 不同意 → 状态改为 REJECTED
+  └─→ 同意 → 状态改为 APPROVED
+  ↓
+SuperAdmin 最终审批
+  ├─→ 拒绝 → 状态改为 REJECTED
+  └─→ 批准 → 状态改为 LIVE (上线)
+  ↓
+产品开始销售
+```
+
+**表结构**：
+```sql
+CREATE TABLE wealth_product_approval (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_id BIGINT NOT NULL,
+  current_step ENUM('CREATED', 'PENDING_FINANCE', 'PENDING_RISK', 'PENDING_ADMIN', 'APPROVED', 'REJECTED'),
+
+  -- 各角色的审核
+  finance_reviewed_by VARCHAR(64),
+  finance_review_at DATETIME,
+  finance_approved TINYINT,
+  finance_comment TEXT,
+
+  risk_reviewed_by VARCHAR(64),
+  risk_review_at DATETIME,
+  risk_approved TINYINT,
+  risk_comment TEXT,
+
+  admin_approved_by VARCHAR(64),
+  admin_approve_at DATETIME,
+  admin_approved TINYINT,
+  admin_comment TEXT,
+
+  created_at DATETIME,
+  INDEX idx_product_id (product_id),
+  INDEX idx_current_step (current_step)
+);
+```
+
+#### 3.2 异常账务处理工作流
+
+```
+对账脚本发现不平衡
+  ↓
+告警记录：reconciliation_alert_log
+  状态：PENDING_REVIEW
+  ↓
+Finance Admin 审查原因
+  ├─→ 确认 Bug → 准备手动调账方案
+  └─→ 确认用户误操作 → 与 Risk Officer 协商处理
+  ↓
+Risk Officer 审批
+  ├─→ 拒绝 → 需重新调查
+  └─→ 同意 → 执行调账
+  ↓
+SuperAdmin 执行调账
+  ├─→ 更新账户余额（带详细备注）
+  ├─→ 记录调账流水（audit_trail）
+  └─→ 更新告警为 RESOLVED
+  ↓
+Compliance 抽查审计
+```
+
+**调账记录表**：
+```sql
+CREATE TABLE account_adjustment (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  account_id BIGINT NOT NULL,
+  adjustment_amount DECIMAL(32,16),  -- 调整金额（可正可负）
+  reason VARCHAR(255),
+
+  -- 审批流
+  requested_by VARCHAR(64),
+  requested_at DATETIME,
+  reviewed_by VARCHAR(64),
+  reviewed_at DATETIME,
+  approved_by VARCHAR(64),
+  approved_at DATETIME,
+
+  status ENUM('PENDING', 'APPROVED', 'EXECUTED', 'CANCELLED'),
+  execution_by VARCHAR(64),
+  executed_at DATETIME,
+
+  created_at DATETIME,
+  INDEX idx_user_id (user_id),
+  INDEX idx_status (status),
+  INDEX idx_approved_at (approved_at)
+);
+```
+
+### 4. 审计日志（P1 新增）
+
+```sql
+-- 所有重要操作都需记录
+CREATE TABLE audit_trail (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  operator_id VARCHAR(64),  -- 操作者
+  operator_role VARCHAR(32),  -- 操作者角色
+  action VARCHAR(64),  -- 操作类型：PRODUCT_LAUNCH, USER_FREEZE, MANUAL_ADJUSTMENT
+  target_id BIGINT,  -- 目标ID（product_id, user_id, account_id）
+  target_type VARCHAR(32),  -- 目标类型：PRODUCT, USER, ACCOUNT
+
+  old_value JSON,  -- 修改前的值
+  new_value JSON,  -- 修改后的值
+
+  reason TEXT,  -- 操作原因
+  ip_address VARCHAR(45),  -- 操作IP
+
+  status ENUM('SUCCESS', 'FAILED'),
+  error_message VARCHAR(255),
+
+  created_at DATETIME,
+  INDEX idx_operator_id (operator_id),
+  INDEX idx_action (action),
+  INDEX idx_target_id (target_id),
+  INDEX idx_created_at (created_at)
+);
+
+-- 示例：product_id=123 上线
+INSERT INTO audit_trail VALUES (
+  NULL, 'admin_001', 'superadmin', 'PRODUCT_LAUNCH',
+  123, 'PRODUCT',
+  JSON_OBJECT('status', 'PENDING'),
+  JSON_OBJECT('status', 'LIVE'),
+  '产品通过 Finance 和 Risk 审核，正式上线',
+  '127.0.0.1', 'SUCCESS', NULL, NOW()
+);
+```
+
+### 5. 监管报表导出（P1 新增）
+
+只有 compliance 和 finance 角色可以导出以下数据：
+
+```sql
+-- 每日交易汇总报表
+SELECT
+  DATE(created_at) as trade_date,
+  COUNT(*) as total_orders,
+  SUM(amount) as total_amount,
+  SUM(interest_expected) as total_interest,
+  COUNT(DISTINCT user_id) as active_users
+FROM wealth_order
+GROUP BY trade_date;
+
+-- 用户额度占用情况（风险监控）
+SELECT
+  user_id, product_id,
+  SUM(amount) as total_invested,
+  (SELECT max_amount FROM wealth_product WHERE id = product_id) as limit_per_product,
+  ROUND(SUM(amount) / (SELECT max_amount FROM wealth_product WHERE id = product_id) * 100, 2) as utilization_rate
+FROM wealth_order
+WHERE status IN (0, 1)  -- 处理中或持有中
+GROUP BY user_id, product_id;
+```
+
+---
+
+### 1. 实时账务平衡检查
+
+#### 1.1 全量对账脚本（每小时运行）
+
+```sql
+-- 检查所有用户的理财账户总余额是否与系统账户平衡
+
+CREATE PROCEDURE reconcile_wealth_accounts()
+BEGIN
+  DECLARE user_total DECIMAL(32,16);
+  DECLARE system_balance DECIMAL(32,16);
+  DECLARE difference DECIMAL(32,16);
+
+  -- 计算所有用户理财账户的总余额
+  SELECT COALESCE(SUM(balance), 0)
+  INTO user_total
+  FROM account
+  WHERE type = 'WEALTH' AND user_id > 0;
+
+  -- 获取系统账户余额
+  SELECT balance
+  INTO system_balance
+  FROM account
+  WHERE user_id = -1 AND type = 'SYSTEM_WEALTH'
+  LIMIT 1;
+
+  -- 计算差异
+  SET difference = system_balance - user_total;
+
+  -- 如果不平衡，立即告警
+  IF ABS(difference) > 0.0001 THEN
+    -- 1. 记录告警日志
+    INSERT INTO reconciliation_alert_log
+    (alert_time, type, user_total, system_balance, difference, status)
+    VALUES (NOW(), 'BALANCE_MISMATCH', user_total, system_balance, difference, 'CRITICAL');
+
+    -- 2. 发送紧急告警（邮件、钉钉等）
+    CALL send_alert('账务不平衡！用户总额:' || user_total ||
+                   ', 系统账户:' || system_balance ||
+                   ', 差异:' || difference);
+
+    -- 3. 冻结理财业务
+    CALL freeze_wealth_business('账户不平衡，已冻结所有理财操作');
+
+    -- 4. 标记为需要人工审查
+    INSERT INTO manual_review_queue
+    (type, description, severity, created_at)
+    VALUES ('ACCOUNT_BALANCE', '账务不平衡，需要人工审查', 'CRITICAL', NOW());
+  ELSE
+    -- 记录成功的对账
+    INSERT INTO reconciliation_log
+    (check_time, type, user_total, system_balance, difference, status)
+    VALUES (NOW(), 'BALANCE_MATCH', user_total, system_balance, difference, 'SUCCESS');
+  END IF;
+END;
+```
+
+#### 1.2 流水对账脚本（每天 01:00 运行）
+
+```sql
+-- 验证每笔流水的金额与余额快照的一致性
+
+CREATE PROCEDURE reconcile_journal_accuracy()
+BEGIN
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE account_id_var BIGINT;
+  DECLARE expected_balance DECIMAL(32,16);
+  DECLARE actual_balance DECIMAL(32,16);
+
+  DECLARE account_cursor CURSOR FOR
+    SELECT DISTINCT account_id FROM account_journal
+    WHERE created_at > DATE_SUB(NOW(), INTERVAL 1 DAY);
+
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  OPEN account_cursor;
+
+  read_loop: LOOP
+    FETCH account_cursor INTO account_id_var;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+
+    -- 从流水最后一条记录获取快照余额
+    SELECT balance_snapshot
+    INTO expected_balance
+    FROM account_journal
+    WHERE account_id = account_id_var
+    ORDER BY created_at DESC, id DESC
+    LIMIT 1;
+
+    -- 从账户表获取当前余额
+    SELECT balance
+    INTO actual_balance
+    FROM account
+    WHERE id = account_id_var;
+
+    -- 如果不匹配，记录异常
+    IF ABS(expected_balance - actual_balance) > 0.0001 THEN
+      INSERT INTO reconciliation_error_log
+      (account_id, expected_balance, actual_balance, error_type, created_at)
+      VALUES (account_id_var, expected_balance, actual_balance, 'SNAPSHOT_MISMATCH', NOW());
+
+      CALL send_alert('账户 ' || account_id_var || ' 余额不一致！');
+    END IF;
+  END LOOP;
+
+  CLOSE account_cursor;
+END;
+```
+
+#### 1.3 幂等性检查（每天 02:00 运行）
+
+```sql
+-- 清理过期的幂等记录，并检查是否有僵尸请求
+
+-- 清理 TTL 过期的记录
+DELETE FROM idempotency_record
+WHERE ttl_expire_at < NOW();
+
+-- 查找超过 5 分钟还在 PROCESSING 状态的请求（异常）
+SELECT *
+FROM idempotency_record
+WHERE status = 'PROCESSING'
+  AND TIMESTAMPDIFF(MINUTE, created_at, NOW()) > 5
+INTO @stale_requests;
+
+-- 如果发现僵尸请求，记录告警
+IF @stale_requests IS NOT NULL THEN
+  INSERT INTO reconciliation_alert_log
+  (alert_time, type, description, status)
+  VALUES (NOW(), 'STALE_REQUEST',
+          '发现超过 5 分钟未完成的 PROCESSING 请求，可能存在系统故障',
+          'WARNING');
+END IF;
+```
+
+### 2. 对账表结构
+
+```sql
+-- 对账日志表
+CREATE TABLE reconciliation_log (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  check_time DATETIME,
+  type VARCHAR(32),  -- BALANCE_MATCH, JOURNAL_VERIFY, etc
+  user_total DECIMAL(32,16),
+  system_balance DECIMAL(32,16),
+  difference DECIMAL(32,16),
+  status ENUM('SUCCESS', 'WARNING', 'CRITICAL'),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 告警日志表
+CREATE TABLE reconciliation_alert_log (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  alert_time DATETIME,
+  type VARCHAR(32),  -- BALANCE_MISMATCH, STALE_REQUEST, etc
+  description TEXT,
+  user_total DECIMAL(32,16),
+  system_balance DECIMAL(32,16),
+  difference DECIMAL(32,16),
+  status ENUM('CRITICAL', 'WARNING') DEFAULT 'CRITICAL',
+  resolved_at DATETIME,
+  resolution_notes TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_alert_time (alert_time),
+  INDEX idx_status (status)
+);
+
+-- 错误日志表
+CREATE TABLE reconciliation_error_log (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  account_id BIGINT,
+  expected_balance DECIMAL(32,16),
+  actual_balance DECIMAL(32,16),
+  error_type VARCHAR(32),
+  description TEXT,
+  resolved TINYINT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_account_id (account_id),
+  INDEX idx_created_at (created_at)
+);
+
+-- 人工审查队列
+CREATE TABLE manual_review_queue (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  type VARCHAR(32),
+  description TEXT,
+  severity ENUM('INFO', 'WARNING', 'CRITICAL'),
+  reviewed_by VARCHAR(64),
+  review_result TEXT,
+  reviewed_at DATETIME,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_severity (severity),
+  INDEX idx_reviewed_at (reviewed_at)
+);
+```
+
+### 3. 监控与告警规则
+
+| 告警条件 | 触发等级 | 行为 |
+|---------|--------|------|
+| 账户总额 ≠ 系统账户 | 🔴 CRITICAL | 立即冻结理财业务，发送紧急告警 |
+| 流水余额快照 ≠ 账户余额 | 🔴 CRITICAL | 标记待人工审查，发送告警 |
+| 处理中请求 > 5分钟未完成 | 🟠 WARNING | 记录告警，人工跟进 |
+| 系统账户余额 < 0 | 🔴 CRITICAL | 暂停所有赎回，查明原因 |
+| 单日幂等性重复率 > 5% | 🟠 WARNING | 监控并分析原因 |
+
+### 4. 冻结业务的实现
+
+```sql
+-- 业务冻结标志表
+CREATE TABLE business_freeze_status (
+  id INT PRIMARY KEY DEFAULT 1,
+  is_frozen TINYINT DEFAULT 0,
+  freeze_reason TEXT,
+  frozen_at DATETIME,
+  unfrozen_at DATETIME
+);
+
+-- 申购、赎回、划转等接口都需要检查冻结状态
+SELECT is_frozen, freeze_reason
+FROM business_freeze_status
+WHERE id = 1;
+
+IF is_frozen = 1:
+  返回错误："系统维护中，暂时无法进行理财操作"
+ELSE:
+  继续正常流程
+```
+
+---
