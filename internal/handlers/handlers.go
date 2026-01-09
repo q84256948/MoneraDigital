@@ -27,11 +27,43 @@ func NewHandler(auth *services.AuthService, lending *services.LendingService, ad
 
 // Auth handlers
 func (h *Handler) Login(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Login endpoint"})
+	var req models.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.AuthService.Login(req)
+	if err != nil {
+		if err.Error() == "invalid credentials" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to login"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *Handler) Register(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Register endpoint"})
+	var req models.RegisterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.AuthService.Register(req)
+	if err != nil {
+		if err.Error() == "email already registered" {
+			c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusCreated, user)
 }
 
 func (h *Handler) GetMe(c *gin.Context) {
