@@ -12,6 +12,9 @@ type Config struct {
 }
 
 func Load() *Config {
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig() // Ignore error if .env doesn't exist
+
 	viper.SetDefault("PORT", "8080")
 	viper.SetDefault("DATABASE_URL", "postgres://user:password@localhost/monera?sslmode=disable")
 	viper.SetDefault("REDIS_URL", "redis://localhost:6379")

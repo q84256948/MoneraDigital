@@ -7,7 +7,8 @@ Monera Digital is an institutional-grade digital asset platform offering secure,
 ### Prerequisites
 
 - Node.js (v20.x or later)
-- npm or bun
+- Go (v1.21 or later) - **Required for Backend**
+- PostgreSQL (or connection string)
 
 ### Installation
 
@@ -17,13 +18,26 @@ Monera Digital is an institutional-grade digital asset platform offering secure,
    npm install
    ```
 3. Copy `.env.example` to `.env` and fill in the required environment variables.
+   - Set `PORT=8081` for the Go backend.
+   - Set `DATABASE_URL` for PostgreSQL.
 
 ### Development
 
-Start the development server:
-```sh
-npm run dev
-```
+You need to run **both** the frontend and the backend.
+
+1. **Start the Go Backend** (Terminal 1):
+   ```sh
+   go run cmd/server/main.go
+   ```
+   *Server runs on http://localhost:8081*
+
+2. **Start the Frontend** (Terminal 2):
+   ```sh
+   npm run dev
+   ```
+   *Frontend runs on http://localhost:8080*
+
+   The frontend is configured to proxy `/api` requests to the backend at `http://localhost:8081`.
 
 ### Build
 
@@ -49,7 +63,7 @@ npm run test
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS, Shadcn UI
-- **Backend**: Node.js, Express (Vercel Serverless Functions)
+- **Backend**: Go (Gin Framework), PostgreSQL
 - **Database**: PostgreSQL (Drizzle ORM), Redis (Upstash)
 - **Testing**: Vitest, Playwright
 
