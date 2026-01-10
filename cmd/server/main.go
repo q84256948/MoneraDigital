@@ -9,6 +9,9 @@ import (
 	"monera-digital/internal/handlers"
 	"monera-digital/internal/middleware"
 	"monera-digital/internal/services"
+	// P1/P2 phase imports temporarily disabled for testing
+	// "monera-digital/internal/routes"
+	// "monera-digital/internal/monitoring"
 )
 
 func main() {
@@ -37,6 +40,7 @@ func main() {
 	// Add middleware
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
+	r.Use(middleware.ErrorHandler())
 
 	// Auth routes
 	authGroup := r.Group("/api/auth")

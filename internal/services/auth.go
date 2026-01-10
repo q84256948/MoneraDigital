@@ -3,6 +3,8 @@ package services
 import (
 	"database/sql"
 	"errors"
+	"time"
+
 	"monera-digital/internal/config"
 	"monera-digital/internal/models"
 	"monera-digital/internal/utils"
@@ -17,10 +19,15 @@ func NewAuthService(db *sql.DB) *AuthService {
 }
 
 type LoginResponse struct {
-	User        *models.User `json:"user,omitempty"`
-	Token       string       `json:"token,omitempty"`
-	Requires2FA bool         `json:"requires_2fa,omitempty"`
-	UserID      int          `json:"user_id,omitempty"`
+	User         *models.User `json:"user,omitempty"`
+	Token        string       `json:"token,omitempty"`
+	AccessToken  string       `json:"access_token,omitempty"`
+	RefreshToken string       `json:"refresh_token,omitempty"`
+	TokenType    string       `json:"token_type,omitempty"`
+	ExpiresIn    int          `json:"expires_in,omitempty"`
+	ExpiresAt    time.Time    `json:"expires_at,omitempty"`
+	Requires2FA  bool         `json:"requires_2fa,omitempty"`
+	UserID       int          `json:"user_id,omitempty"`
 }
 
 func (s *AuthService) Register(req models.RegisterRequest) (*models.User, error) {
@@ -61,10 +68,10 @@ func (s *AuthService) Login(req models.LoginRequest) (*LoginResponse, error) {
 	// 1. Find user
 	var user models.User
 	var hashedPassword string
-	
+
 	query := `SELECT id, email, password, two_factor_enabled FROM users WHERE email = $1`
 	err := s.DB.QueryRow(query, req.Email).Scan(&user.ID, &user.Email, &hashedPassword, &user.TwoFactorEnabled)
-	
+
 	if err == sql.ErrNoRows {
 		return nil, errors.New("invalid credentials")
 	} else if err != nil {
@@ -77,18 +84,21 @@ func (s *AuthService) Login(req models.LoginRequest) (*LoginResponse, error) {
 	}
 
 	// 3. Generate Token
-	// Note: In a real app, we should pass the secret from config properly.
-	// For now, we load it again or assume it's passed. 
-	// To keep signature simple, let's load config here (not ideal for perf but works)
 	cfg := config.Load()
 	token, err := utils.GenerateJWT(user.ID, user.Email, cfg.JWTSecret)
 	if err != nil {
 		return nil, err
 	}
 
+	expiresAt := time.Now().Add(24 * time.Hour)
+
 	return &LoginResponse{
-		User:  &user,
-		Token: token,
+		User:        &user,
+		Token:       token,
+		AccessToken: token,
+		TokenType:   "Bearer",
+		ExpiresIn:   86400, // 24 hours in seconds
+		ExpiresAt:   expiresAt,
 	}, nil
 }
 

@@ -1,7 +1,11 @@
 // internal/models/token.go
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
 
 // TokenPair 令牌对（访问令牌 + 刷新令牌）
 type TokenPair struct {
@@ -19,6 +23,39 @@ type TokenClaims struct {
 	TokenType string `json:"token_type"` // "access" 或 "refresh"
 	ExpiresAt int64  `json:"exp"`
 	IssuedAt  int64  `json:"iat"`
+}
+
+// Implement jwt.Claims interface
+func (tc *TokenClaims) GetAudience() (jwt.ClaimStrings, error) {
+	return jwt.ClaimStrings{}, nil
+}
+
+func (tc *TokenClaims) GetExpirationTime() (*jwt.NumericDate, error) {
+	if tc.ExpiresAt == 0 {
+		return nil, nil
+	}
+	t := jwt.NewNumericDate(time.Unix(tc.ExpiresAt, 0))
+	return t, nil
+}
+
+func (tc *TokenClaims) GetIssuedAt() (*jwt.NumericDate, error) {
+	if tc.IssuedAt == 0 {
+		return nil, nil
+	}
+	t := jwt.NewNumericDate(time.Unix(tc.IssuedAt, 0))
+	return t, nil
+}
+
+func (tc *TokenClaims) GetIssuer() (string, error) {
+	return "", nil
+}
+
+func (tc *TokenClaims) GetNotBefore() (*jwt.NumericDate, error) {
+	return nil, nil
+}
+
+func (tc *TokenClaims) GetSubject() (string, error) {
+	return "", nil
 }
 
 // RefreshTokenRequest 刷新令牌请求
