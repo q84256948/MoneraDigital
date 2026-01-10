@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+cd "$(dirname "$0")/.."
+
+echo "Current directory: $(pwd)"
+
 echo "Installing npm dependencies..."
 npm install
 
@@ -12,5 +16,9 @@ go mod download
 
 echo "Building Go backend..."
 go build -o server ./cmd/server/main.go
+
+echo "Verifying server binary..."
+ls -la server
+chmod +x server
 
 echo "Build complete!"
