@@ -6,6 +6,10 @@ run = "bash scripts/start-replit.sh"
 channel = "stable-25_05"
 
 [[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
 localPort = 5001
 externalPort = 3000
 
@@ -48,4 +52,9 @@ waitForPort = 5000
 deploymentTarget = "autoscale"
 build = ["bash", "scripts/build.sh"]
 publicDir = "dist"
-run = ["bash", "-c", "GIN_MODE=release ./server"]
+run = ["./server"]
+
+[userenv]
+
+[userenv.production]
+GIN_MODE = "release"

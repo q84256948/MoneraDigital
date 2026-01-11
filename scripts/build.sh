@@ -15,7 +15,7 @@ echo "Installing Go dependencies..."
 go mod download
 
 echo "Building Go backend..."
-go build -o server ./cmd/server/main.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./cmd/server/main.go
 
 echo "Verifying server binary..."
 ls -la server
