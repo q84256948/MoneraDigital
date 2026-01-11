@@ -32,7 +32,7 @@ func main() {
 	// 2. Read SQL file
 	sqlFilePath := "docs/静态理财/需求文档MD/数据库建表脚本.sql"
 	fmt.Printf("Reading SQL file: %s\n", sqlFilePath)
-	
+
 	content, err := os.ReadFile(sqlFilePath)
 	if err != nil {
 		// Try absolute path or check current dir
@@ -45,7 +45,7 @@ func main() {
 	// 3. Execute SQL
 	// Postgres driver (lib/pq) supports multiple statements in one Exec
 	fmt.Println("Executing SQL script...")
-	
+
 	// We wrap it in a transaction
 	tx, err := db.Begin()
 	if err != nil {

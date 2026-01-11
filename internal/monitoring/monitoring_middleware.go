@@ -35,10 +35,10 @@ func MonitoringMiddleware(metrics *Metrics) gin.HandlerFunc {
 
 // AlertThreshold represents an alert threshold
 type AlertThreshold struct {
-	Name              string
-	Condition         func(*Metrics) bool
-	Message           string
-	SeverityLevel     string // "info", "warning", "critical"
+	Name          string
+	Condition     func(*Metrics) bool
+	Message       string
+	SeverityLevel string // "info", "warning", "critical"
 }
 
 // AlertManager manages system alerts
@@ -50,10 +50,10 @@ type AlertManager struct {
 
 // Alert represents a triggered alert
 type Alert struct {
-	Timestamp   time.Time
-	Message     string
+	Timestamp     time.Time
+	Message       string
 	SeverityLevel string
-	Resolved    bool
+	Resolved      bool
 }
 
 // NewAlertManager creates a new alert manager

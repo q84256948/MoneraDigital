@@ -1,107 +1,86 @@
 package main
 
 import (
-        "log"
-        "net/http"
-        "os"
-        "path/filepath"
+	"net/http"
+	"os"
+	"path/filepath"
 
-        "github.com/gin-gonic/gin"
-        "monera-digital/internal/config"
-        "monera-digital/internal/db"
-        "monera-digital/internal/handlers"
-        "monera-digital/internal/middleware"
-        "monera-digital/internal/services"
+	"github.com/gin-gonic/gin"
+	"monera-digital/internal/config"
+	"monera-digital/internal/container"
+	"monera-digital/internal/db"
+	"monera-digital/internal/logger"
+	"monera-digital/internal/middleware"
+	"monera-digital/internal/routes"
 )
 
 func main() {
-        // Load configuration
-        cfg := config.Load()
+	// Load configuration
+	cfg := config.Load()
 
-        // Initialize database
-        database, err := db.InitDB(cfg.DatabaseURL)
-        if err != nil {
-                log.Fatalf("Failed to initialize database: %v", err)
-        }
-        defer database.Close()
+	// Initialize logger
+	env := "development"
+	if cfg.Port != "8080" {
+		env = "production"
+	}
+	if err := logger.Init(env); err != nil {
+		panic("Failed to initialize logger: " + err.Error())
+	}
+	defer logger.GetLogger().Sync()
 
-        // Initialize services
-        authService := services.NewAuthService(database, cfg.JWTSecret)
-        lendingService := services.NewLendingService(database)
-        addressService := services.NewAddressService(database)
-        withdrawalService := services.NewWithdrawalService(database)
+	// Log startup
+	logger.Info("Starting Monera Digital API server",
+		"port", cfg.Port,
+		"environment", env)
 
-        // Initialize handlers
-        h := handlers.NewHandler(authService, lendingService, addressService, withdrawalService)
+	// Initialize database
+	database, err := db.InitDB(cfg.DatabaseURL)
+	if err != nil {
+		logger.Fatal("Failed to initialize database",
+			"error", err.Error())
+	}
+	defer database.Close()
+	logger.Info("Database connected successfully")
 
-        // Initialize Gin router
-        r := gin.Default()
+	// Initialize container
+	cont := container.NewContainer(database, cfg.JWTSecret)
 
-        // Add middleware
-        r.Use(middleware.CORS())
-        r.Use(middleware.Logger())
-        r.Use(middleware.ErrorHandler())
+	// Verify container
+	if err := cont.Verify(); err != nil {
+		logger.Fatal("Container verification failed",
+			"error", err.Error())
+	}
 
-        // Auth routes
-        authGroup := r.Group("/api/auth")
-        {
-                authGroup.POST("/login", h.Login)
-                authGroup.POST("/register", h.Register)
-                authGroup.GET("/me", middleware.AuthRequired(cfg.JWTSecret), h.GetMe)
-                authGroup.POST("/2fa/setup", middleware.AuthRequired(cfg.JWTSecret), h.Setup2FA)
-                authGroup.POST("/2fa/enable", middleware.AuthRequired(cfg.JWTSecret), h.Enable2FA)
-                authGroup.POST("/2fa/verify-login", h.Verify2FALogin)
-        }
+	// Initialize Gin router
+	r := gin.Default()
 
-        // Lending routes
-        lendingGroup := r.Group("/api/lending")
-        lendingGroup.Use(middleware.AuthRequired(cfg.JWTSecret))
-        {
-                lendingGroup.POST("/apply", h.ApplyForLending)
-                lendingGroup.GET("/positions", h.GetUserPositions)
-        }
+	// Add CORS middleware
+	r.Use(middleware.CORS())
 
-        // Addresses routes
-        addressesGroup := r.Group("/api/addresses")
-        addressesGroup.Use(middleware.AuthRequired(cfg.JWTSecret))
-        {
-                addressesGroup.GET("", h.GetAddresses)
-                addressesGroup.POST("", h.AddAddress)
-                addressesGroup.POST("/:id/verify", h.VerifyAddress)
-                addressesGroup.POST("/:id/primary", h.SetPrimaryAddress)
-                addressesGroup.DELETE("/:id", h.DeactivateAddress)
-        }
+	// Setup routes
+	routes.SetupRoutes(r, cont)
 
-        // Withdrawals routes
-        withdrawalsGroup := r.Group("/api/withdrawals")
-        withdrawalsGroup.Use(middleware.AuthRequired(cfg.JWTSecret))
-        {
-                withdrawalsGroup.GET("", h.GetWithdrawals)
-                withdrawalsGroup.POST("", h.CreateWithdrawal)
-                withdrawalsGroup.GET("/:id", h.GetWithdrawalByID)
-        }
+	// Serve static files in production
+	distPath := "./dist"
+	if _, err := os.Stat(distPath); err == nil {
+		r.Static("/assets", filepath.Join(distPath, "assets"))
+		r.StaticFile("/favicon.ico", filepath.Join(distPath, "favicon.ico"))
+		r.StaticFile("/robots.txt", filepath.Join(distPath, "robots.txt"))
+		r.StaticFile("/placeholder.svg", filepath.Join(distPath, "placeholder.svg"))
 
-        // Docs route
-        r.GET("/api/docs", h.GetDocs)
+		r.NoRoute(func(c *gin.Context) {
+			c.File(filepath.Join(distPath, "index.html"))
+		})
+	} else {
+		r.NoRoute(func(c *gin.Context) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
+		})
+	}
 
-        // Serve static files in production
-        distPath := "./dist"
-        if _, err := os.Stat(distPath); err == nil {
-                r.Static("/assets", filepath.Join(distPath, "assets"))
-                r.StaticFile("/favicon.ico", filepath.Join(distPath, "favicon.ico"))
-                r.StaticFile("/robots.txt", filepath.Join(distPath, "robots.txt"))
-                r.StaticFile("/placeholder.svg", filepath.Join(distPath, "placeholder.svg"))
-
-                r.NoRoute(func(c *gin.Context) {
-                        c.File(filepath.Join(distPath, "index.html"))
-                })
-        } else {
-                r.NoRoute(func(c *gin.Context) {
-                        c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
-                })
-        }
-
-        // Start server
-        log.Printf("Server starting on port %s", cfg.Port)
-        r.Run(":" + cfg.Port)
+	// Start server
+	logger.Info("Server starting on port " + cfg.Port)
+	if err := r.Run(":" + cfg.Port); err != nil {
+		logger.Fatal("Server failed to start",
+			"error", err.Error())
+	}
 }

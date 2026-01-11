@@ -27,14 +27,14 @@ type User interface {
 
 // UserModel 用户模型
 type UserModel struct {
-	ID                 int
-	Email              string
-	Password           string
-	TwoFactorEnabled   bool
-	TwoFactorSecret    string
+	ID                   int
+	Email                string
+	Password             string
+	TwoFactorEnabled     bool
+	TwoFactorSecret      string
 	TwoFactorBackupCodes string
-	CreatedAt          string
-	UpdatedAt          string
+	CreatedAt            string
+	UpdatedAt            string
 }
 
 // Lending 借贷仓储接口
@@ -54,17 +54,17 @@ type Lending interface {
 
 // LendingPositionModel 借贷头寸模型
 type LendingPositionModel struct {
-	ID            int
-	UserID        int
-	Asset         string
-	Amount        string
-	DurationDays  int
-	APY           string
-	AccruedYield  string
-	Status        string
-	StartDate     string
-	EndDate       string
-	CreatedAt     string
+	ID           int
+	UserID       int
+	Asset        string
+	Amount       string
+	DurationDays int
+	APY          string
+	AccruedYield string
+	Status       string
+	StartDate    string
+	EndDate      string
+	CreatedAt    string
 }
 
 // Address 地址仓储接口
@@ -87,15 +87,15 @@ type Address interface {
 
 // WithdrawalAddressModel 提现地址模型
 type WithdrawalAddressModel struct {
-	ID         int
-	UserID     int
-	Address    string
-	AddressType string
-	Label      string
-	IsVerified bool
-	IsPrimary  bool
-	CreatedAt  string
-	VerifiedAt string
+	ID            int
+	UserID        int
+	Address       string
+	AddressType   string
+	Label         string
+	IsVerified    bool
+	IsPrimary     bool
+	CreatedAt     string
+	VerifiedAt    string
 	DeactivatedAt string
 }
 

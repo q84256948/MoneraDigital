@@ -23,9 +23,9 @@ type Migration interface {
 
 // MigrationRecord represents a recorded migration in the database
 type MigrationRecord struct {
-	ID        int
-	Version   string
-	Name      string
+	ID         int
+	Version    string
+	Name       string
 	ExecutedAt time.Time
 }
 

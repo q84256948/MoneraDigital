@@ -6,6 +6,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"monera-digital/internal/container"
+	"monera-digital/internal/docs"
 	"monera-digital/internal/handlers"
 	"monera-digital/internal/middleware"
 )
@@ -17,7 +18,10 @@ func SetupRoutes(router *gin.Engine, cont *container.Container) {
 	router.Use(middleware.ErrorHandler())
 	router.Use(middleware.RateLimitMiddleware(cont.RateLimiter))
 
-	// Swagger documentation
+	// Initialize Swagger documentation
+	docs.NewSwagger()
+
+	// Swagger documentation endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Create handler

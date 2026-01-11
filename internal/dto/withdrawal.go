@@ -13,17 +13,17 @@ type CreateWithdrawalRequest struct {
 
 // WithdrawalResponse DTO for withdrawal response
 type WithdrawalResponse struct {
-	ID            int       `json:"id"`
-	UserID        int       `json:"user_id"`
-	FromAddressID int       `json:"from_address_id"`
-	Amount        float64   `json:"amount"`
-	Asset         string    `json:"asset"`
-	ToAddress     string    `json:"to_address"`
-	Status        string    `json:"status"`
-	TxHash        *string   `json:"tx_hash,omitempty"`
-	CreatedAt     time.Time `json:"created_at"`
+	ID            int        `json:"id"`
+	UserID        int        `json:"user_id"`
+	FromAddressID int        `json:"from_address_id"`
+	Amount        float64    `json:"amount"`
+	Asset         string     `json:"asset"`
+	ToAddress     string     `json:"to_address"`
+	Status        string     `json:"status"`
+	TxHash        *string    `json:"tx_hash,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
 	CompletedAt   *time.Time `json:"completed_at,omitempty"`
-	FailureReason *string   `json:"failure_reason,omitempty"`
+	FailureReason *string    `json:"failure_reason,omitempty"`
 }
 
 // WithdrawalsListResponse DTO for list of withdrawals

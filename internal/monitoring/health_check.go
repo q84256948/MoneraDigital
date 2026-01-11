@@ -2,6 +2,7 @@
 package monitoring
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 	"time"
@@ -28,11 +29,11 @@ func NewHealthCheckService(db *sql.DB, cache cache.CacheService, metrics *Metric
 
 // HealthStatus represents the health status of the system
 type HealthStatus struct {
-	Status    string                 `json:"status"`
-	Timestamp time.Time              `json:"timestamp"`
-	Uptime    float64                `json:"uptime_seconds"`
+	Status     string                     `json:"status"`
+	Timestamp  time.Time                  `json:"timestamp"`
+	Uptime     float64                    `json:"uptime_seconds"`
 	Components map[string]ComponentStatus `json:"components"`
-	Metrics   map[string]interface{} `json:"metrics"`
+	Metrics    map[string]interface{}     `json:"metrics"`
 }
 
 // ComponentStatus represents the status of a system component
@@ -140,6 +141,17 @@ func (hcs *HealthCheckService) MetricsHandler() gin.HandlerFunc {
 	}
 }
 
+// CacheError represents a cache-related error
+type CacheError struct {
+	Operation string
+	Key       string
+	Message   string
+}
+
+func (e *CacheError) Error() string {
+	return e.Message
+}
+
 // Custom errors
 var (
 	ErrCacheValueMismatch = &CacheError{
@@ -148,6 +160,3 @@ var (
 		Message:   "cache value mismatch",
 	}
 )
-
-// Import context
-import "context"

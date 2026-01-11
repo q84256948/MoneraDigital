@@ -8,7 +8,7 @@ import (
 	"monera-digital/internal/models"
 )
 
-type LendingService struct{
+type LendingService struct {
 	DB *sql.DB
 }
 

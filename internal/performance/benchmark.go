@@ -8,13 +8,13 @@ import (
 
 // BenchmarkResult represents the result of a benchmark
 type BenchmarkResult struct {
-	Name           string
-	Iterations     int
-	TotalDuration  time.Duration
-	AvgDuration    time.Duration
-	MinDuration    time.Duration
-	MaxDuration    time.Duration
-	OpsPerSecond   float64
+	Name            string
+	Iterations      int
+	TotalDuration   time.Duration
+	AvgDuration     time.Duration
+	MinDuration     time.Duration
+	MaxDuration     time.Duration
+	OpsPerSecond    float64
 	MemoryAllocated uint64
 }
 

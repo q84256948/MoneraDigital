@@ -12,14 +12,14 @@ type AddAddressRequest struct {
 
 // WithdrawalAddressResponse DTO for withdrawal address response
 type WithdrawalAddressResponse struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
-	Address   string    `json:"address"`
-	Type      string    `json:"type"`
-	Label     string    `json:"label"`
-	IsVerified bool     `json:"is_verified"`
-	IsPrimary bool      `json:"is_primary"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         int        `json:"id"`
+	UserID     int        `json:"user_id"`
+	Address    string     `json:"address"`
+	Type       string     `json:"type"`
+	Label      string     `json:"label"`
+	IsVerified bool       `json:"is_verified"`
+	IsPrimary  bool       `json:"is_primary"`
+	CreatedAt  time.Time  `json:"created_at"`
 	VerifiedAt *time.Time `json:"verified_at,omitempty"`
 }
 
