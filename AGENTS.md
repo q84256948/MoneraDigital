@@ -61,3 +61,111 @@
 - `CLAUDE.md`: Similar context file.
 - `src/db/schema.ts`: Database schema.
 - `vite.config.ts`: Build configuration.
+
+---
+
+## Go Code Conventions (Backend in `internal/`)
+
+> Target: Readable, maintainable, consistent Go code. Go 1.20+, Gin framework.
+
+### 1. Project Structure
+
+```
+cmd/server/         # Entry point
+internal/           # Business logic
+  ├── handlers/     # HTTP handlers
+  ├── services/     # Business logic
+  ├── models/       # Data models
+  └── middleware/   # HTTP middleware
+```
+
+- All business code in `internal/`
+- `cmd` only for dependency assembly and startup
+
+### 2. Naming
+
+- **Package**: lowercase, no underscore, no plural
+  ```go
+  package user    // ✅
+  package users   // ❌
+  package user_service  // ❌
+  ```
+- **Variables/Functions**: camelCase, short but readable
+  ```go
+  userID, ctx, httpReq  // ✅
+  ```
+- **Exported identifiers**: MUST have doc comments
+
+### 3. Files & Code Style
+
+- Filename: lowercase + underscore
+  `user_service.go`, `auth_handler.go`
+- Single file ≤ **300 lines**
+- One function = one responsibility
+
+### 4. Error Handling
+
+- **Errors MUST be handled**
+- No `panic` for business errors
+- Use error wrapping:
+  ```go
+  return fmt.Errorf("create user failed: %w", err)
+  ```
+
+### 5. Context规范
+
+- **All I/O/DB/RPC MUST pass `context.Context`**
+- `context` is ALWAYS the first parameter
+- Don't store in struct, don't abuse `context.Background()`
+
+### 6. Logging
+
+- Use structured logging ( zap or zerolog )
+- **Log only at boundary layer** (handler / job)
+- Don't log in底层 libraries
+
+### 7. Interface & Struct
+
+- **Small interfaces**
+- Define interface at the consumer side
+- Struct only cares about its own responsibilities
+
+### 8. Concurrency
+
+- Goroutine MUST be cancellable
+- Prefer `errgroup` when possible
+- Never leak goroutines
+
+### 9. Testing
+
+- Test file: `*_test.go`
+- Prefer table-driven tests
+- Don't depend on real external services
+
+### 10. Required Tools (Mandatory)
+
+```bash
+gofmt -w .
+go vet ./...
+```
+
+Recommended: `golangci-lint`
+
+### 11. Prohibited (Must Follow)
+
+- ❌ No `init()` in business code
+- ❌ No global variables for business state
+- ❌ No "utils" catch-all packages
+
+---
+
+## Quick Reference
+
+| Category | Rule |
+|----------|------|
+| Package name | lowercase, no plural |
+| File size | ≤ 300 lines |
+| Error handling | Never ignore errors |
+| Context | First param, for I/O only |
+| Logging | Handler layer only |
+| Interface | Small, defined at consumer |
