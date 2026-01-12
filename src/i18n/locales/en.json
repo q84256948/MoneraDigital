@@ -298,10 +298,10 @@
   "wallet": {
     "opening": {
       "title": "Activate Your Wallet",
-      "description": "Create your secure digital asset wallet account with Safeheron custody service.",
-      "cardTitle": "Safeheron Custody Account",
-      "cardDescription": "To deposit funds and use our financial services, you need to activate your dedicated Safeheron custody account first.",
-      "securityInfo": "Your assets are protected by institutional-grade multi-signature custody technology. Safeheron is a leading digital asset custodian trusted by institutions worldwide.",
+      "description": "Create your secure digital asset wallet account with MoneraDigital's institutional-grade custody service.",
+      "cardTitle": "MoneraDigital Custody Account",
+      "cardDescription": "To deposit funds and use our financial services, you need to activate your dedicated MoneraDigital custody account first.",
+      "securityInfo": "Your assets are protected by institutional-grade multi-signature custody technology. MoneraDigital provides secure digital asset management for institutional investors.",
       "activateButton": "Activate Now",
       "creating": "Creating your wallet account...",
       "activated": "Account Activated Successfully",
@@ -315,7 +315,7 @@
       "feature3Title": "Full Transparency",
       "feature3Description": "All transactions are verifiable on-chain with complete audit trail.",
       "successTitle": "Wallet Activated",
-      "successDescription": "Your Safeheron custody account has been created successfully.",
+      "successDescription": "Your MoneraDigital custody account has been created successfully.",
       "errorTitle": "Activation Failed",
       "errorDescription": "Unable to create wallet account. Please try again later.",
       "error": "Failed to create wallet account",

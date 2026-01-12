@@ -32,9 +32,9 @@ describe('AccountOpening', () => {
     expect(screen.getByText(/Create your secure digital asset wallet/)).toBeInTheDocument();
   });
 
-  it('should render the main card with Safeheron title', () => {
+  it('should render the main card with MoneraDigital custody title', () => {
     renderComponent();
-    expect(screen.getByText('Safeheron Custody Account')).toBeInTheDocument();
+    expect(screen.getByText('MoneraDigital Custody Account')).toBeInTheDocument();
   });
 
   it('should render the security info text', () => {

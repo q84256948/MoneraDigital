@@ -18,13 +18,13 @@ const AccountOpening = () => {
     setStatus("loading");
 
     try {
-      // Simulate API call to Safeheron
+      // Simulate API call to create custody account
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Mock successful response
       setWalletData({
         address: "0x1234567890abcdef1234567890abcdef12345678",
-        walletId: "wallet_sfh_abc123def456",
+        walletId: "wallet_abc123def456",
       });
       setStatus("success");
 
