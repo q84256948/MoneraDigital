@@ -179,7 +179,10 @@
       "loginFailed": "Login failed",
       "registrationFailed": "Registration failed",
       "invalidEmail": "Invalid email format",
-      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordComplexity": "Password must contain uppercase, lowercase, and digit characters",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
       "userAlreadyExists": "User already exists",
       "invalidEmailOrPassword": "Invalid email or password"
     }

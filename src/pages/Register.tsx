@@ -29,12 +29,24 @@ export default function Register() {
   };
 
   const validatePassword = (pwd: string) => {
-    // Basic client-side check to give immediate feedback if desired,
-    // but primarily we rely on server response.
-    // Here we just clear error if it looks okay-ish to avoid sticky errors.
     if (pwd.length >= 8) {
        // Ideally check regex too, but server is authority.
     }
+  };
+
+  const getLocalizedError = (message: string) => {
+    if (!message) return "";
+    const msg = message.toLowerCase();
+    
+    if (msg.includes("email is required")) return t("auth.errors.emailRequired");
+    if (msg.includes("invalid email")) return t("auth.errors.invalidEmail");
+    if (msg.includes("password is required")) return t("auth.errors.passwordRequired");
+    if (msg.includes("at least 8 characters")) return t("auth.errors.passwordTooShort");
+    if (msg.includes("uppercase, lowercase, and digit")) return t("auth.errors.passwordComplexity");
+    if (msg.includes("email is already registered") || msg.includes("user already exists") || msg.includes("email already exists")) return t("auth.errors.userAlreadyExists");
+    
+    // Fallback to original message if no match (or maybe a generic error)
+    return message;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,14 +73,17 @@ export default function Register() {
       }
 
       if (!res.ok) {
+        const serverMsg = data.message || data.error || "";
+        const localizedMsg = getLocalizedError(serverMsg);
+
         // Handle specific field errors
         if (data.details === "email") {
-            setEmailError(data.message);
+            setEmailError(localizedMsg);
         } else if (data.details === "password") {
-            setPasswordError(data.message);
+            setPasswordError(localizedMsg);
         }
         
-        throw new Error(data.error || data.message || t("auth.errors.registrationFailed"));
+        throw new Error(localizedMsg || t("auth.errors.registrationFailed"));
       }
 
       console.log("Registration successful");
@@ -79,8 +94,7 @@ export default function Register() {
       }, 1000);
     } catch (error: any) {
       console.error("Registration error:", error);
-      // We already set specific field errors above if applicable.
-      // Show generic toast as well for visibility.
+      // Show toast
       toast.error(error.message);
     } finally {
       setIsLoading(false);
