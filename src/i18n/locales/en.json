@@ -176,9 +176,8 @@
       "successMessage": "Registration successful. Please log in."
     },
     "errors": {
-      "loginFailed": "Login failed",
       "registrationFailed": "Registration failed",
-      "invalidEmail": "Invalid email format",
+      "invalidEmailFormat": "Invalid email format",
       "passwordTooShort": "Password must be at least 8 characters",
       "passwordComplexity": "Password must contain uppercase, lowercase, and digit characters",
       "emailRequired": "Email is required",
@@ -186,12 +185,10 @@
       "userAlreadyExists": "User already exists",
       "invalidEmailOrPassword": "Invalid email or password",
       "invalidParameters": "Invalid parameters, please check your input",
-      "invalidEmailFormat": "Invalid email format",
       "invalidPasswordFormat": "Password must contain uppercase, lowercase, and digit characters",
       "emailAlreadyRegistered": "This email is already registered",
-      "serverError": "Server error, please try again later",
-      "emailNotFound": "Email input error or does not exist",
-      "invalidPassword": "Password input error"
+      "serverError": "Server error, please try later",
+      "emailNotFound": "Email input error or does not exist"
     }
   },
   "notFound": {

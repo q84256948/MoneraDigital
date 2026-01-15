@@ -39,7 +39,7 @@ export default function Register() {
     const msg = message.toLowerCase();
     
     if (msg.includes("email is required")) return t("auth.errors.emailRequired");
-    if (msg.includes("invalid email")) return t("auth.errors.invalidEmail");
+    if (msg.includes("invalid email")) return t("auth.errors.invalidEmailFormat");
     if (msg.includes("password is required")) return t("auth.errors.passwordRequired");
     if (msg.includes("at least 8 characters")) return t("auth.errors.passwordTooShort");
     if (msg.includes("uppercase, lowercase, and digit")) return t("auth.errors.passwordComplexity");
