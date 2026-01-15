@@ -50,6 +50,11 @@ func handleError(c *gin.Context, err error) {
 	errMsg := err.Error()
 
 	switch errMsg {
+	case "email not found":
+		c.JSON(http.StatusUnauthorized, ErrorResponse{
+			Code:    "EMAIL_NOT_FOUND",
+			Message: "Email input error or does not exist",
+		})
 	case "invalid credentials":
 		c.JSON(http.StatusUnauthorized, ErrorResponse{
 			Code:    "INVALID_CREDENTIALS",

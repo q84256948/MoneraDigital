@@ -8,6 +8,12 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
+interface RegisterError {
+  code: string;
+  message: string;
+  details?: string;
+}
+
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,25 +34,23 @@ export default function Register() {
     setPasswordError("");
   };
 
-  const validatePassword = (pwd: string) => {
-    if (pwd.length >= 8) {
-       // Ideally check regex too, but server is authority.
-    }
-  };
-
   const getLocalizedError = (message: string) => {
     if (!message) return "";
     const msg = message.toLowerCase();
     
     if (msg.includes("email is required")) return t("auth.errors.emailRequired");
-    if (msg.includes("invalid email")) return t("auth.errors.invalidEmail");
+    if (msg.includes("invalid email")) return t("auth.errors.invalidEmailFormat");
     if (msg.includes("password is required")) return t("auth.errors.passwordRequired");
     if (msg.includes("at least 8 characters")) return t("auth.errors.passwordTooShort");
     if (msg.includes("uppercase, lowercase, and digit")) return t("auth.errors.passwordComplexity");
     if (msg.includes("email is already registered") || msg.includes("user already exists") || msg.includes("email already exists")) return t("auth.errors.userAlreadyExists");
     
-    // Fallback to original message if no match (or maybe a generic error)
     return message;
+  };
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,6 +59,18 @@ export default function Register() {
     setIsLoading(true);
     console.log("Attempting registration for:", email);
 
+    if (password.length < 8) {
+      setPasswordError(t("auth.errors.passwordTooShort"));
+      setIsLoading(false);
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setEmailError(t("auth.errors.invalidEmailFormat"));
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -62,7 +78,7 @@ export default function Register() {
         body: JSON.stringify({ email, password }),
       });
 
-      let data;
+      let data: RegisterError;
       const contentType = res.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await res.json();
@@ -73,17 +89,8 @@ export default function Register() {
       }
 
       if (!res.ok) {
-        const serverMsg = data.message || data.error || "";
-        const localizedMsg = getLocalizedError(serverMsg);
-
-        // Handle specific field errors
-        if (data.details === "email") {
-            setEmailError(localizedMsg);
-        } else if (data.details === "password") {
-            setPasswordError(localizedMsg);
-        }
-        
-        throw new Error(localizedMsg || t("auth.errors.registrationFailed"));
+        handleApiError(data);
+        return;
       }
 
       console.log("Registration successful");
@@ -94,10 +101,45 @@ export default function Register() {
       }, 1000);
     } catch (error: any) {
       console.error("Registration error:", error);
-      // Show toast
-      toast.error(error.message);
+      if (!emailError && !passwordError) {
+        toast.error(error.message);
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleApiError = (data: RegisterError) => {
+    const errorCode = data.code || "";
+    const errorMessage = data.message || "";
+    const errorDetails = data.details || "";
+    const localizedMessage = getLocalizedError(errorMessage);
+
+    switch (errorCode) {
+      case "VALIDATION_ERROR":
+        if (errorDetails === "email") {
+          setEmailError(t("auth.errors.invalidEmailFormat"));
+        } else if (errorDetails === "password") {
+          setPasswordError(t("auth.errors.invalidPasswordFormat"));
+        } else {
+          toast.error(t("auth.errors.invalidParameters"));
+        }
+        break;
+      case "EMAIL_ALREADY_EXISTS":
+        setEmailError(t("auth.errors.emailAlreadyRegistered"));
+        break;
+      case "INTERNAL_ERROR":
+      case "PANIC_RECOVERED":
+        toast.error(t("auth.errors.serverError"));
+        break;
+      default:
+        if (errorDetails === "email") {
+          setEmailError(localizedMessage);
+        } else if (errorDetails === "password") {
+          setPasswordError(localizedMessage);
+        } else {
+          toast.error(localizedMessage || t("auth.errors.registrationFailed"));
+        }
     }
   };
 
@@ -120,16 +162,27 @@ export default function Register() {
                 placeholder={t("auth.register.emailPlaceholder")}
                 value={email}
                 onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (emailError) setEmailError("");
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError("");
+                }}
+                onInvalid={(e) => {
+                  e.preventDefault();
+                  if (!isValidEmail(email)) {
+                    setEmailError(t("auth.errors.invalidEmailFormat"));
+                  }
+                }}
+                onInvalid={(e) => {
+                  e.preventDefault();
+                  if (!isValidEmail(email)) {
+                    setEmailError(t("auth.errors.invalidEmailFormat"));
+                  }
                 }}
                 className={cn(emailError && "border-red-500 focus-visible:ring-red-500")}
-                required
               />
               {emailError && (
-                  <p className="text-xs text-red-500 animate-in fade-in-0 slide-in-from-top-1">
-                      {emailError}
-                  </p>
+                <p className="text-xs text-red-500 animate-in fade-in-0 slide-in-from-top-1">
+                  {emailError}
+                </p>
               )}
             </div>
             <div className="space-y-2">
@@ -141,9 +194,8 @@ export default function Register() {
                 type="password"
                 value={password}
                 onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (passwordError) setPasswordError("");
-                    validatePassword(e.target.value);
+                  setPassword(e.target.value);
+                  if (passwordError) setPasswordError("");
                 }}
                 className={cn(passwordError && "border-red-500 focus-visible:ring-red-500")}
                 required
